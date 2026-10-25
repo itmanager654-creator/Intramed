@@ -1,0 +1,40 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg: #ffffff; --bg-alt: #faf7f7; --surface: #ffffff; --surface-2: #fdf5f5;
+  --text: #181414; --text-muted: #6b6468; --accent: #c00000; --accent-dark: #8f0000;
+  --accent-tint: #fbeaea; --border: #ecdede; --shadow: 0 10px 30px rgba(192, 0, 0, 0.07);
+  color-scheme: light;
+}
+html.dark {
+  --bg: #111010; --bg-alt: #161414; --surface: #1b1919; --surface-2: #1f1616;
+  --text: #f3efef; --text-muted: #a9a0a0; --accent: #ff4b4b; --accent-dark: #c00000;
+  --accent-tint: rgba(255, 75, 75, 0.12); --border: #2c2626; --shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+  color-scheme: dark;
+}
+
+@layer base {
+  html { scroll-behavior: smooth; }
+  body { @apply bg-bg font-sans leading-relaxed text-ink antialiased; transition: background 0.3s, color 0.3s; }
+  h1, h2, h3, h4 { @apply font-heading tracking-tight; }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+}
+
+@layer components {
+  .wrap { @apply mx-auto w-full max-w-[1180px] px-5 sm:px-8; }
+  .section { @apply py-14 md:py-20; }
+  .btn { @apply inline-flex items-center justify-center rounded-xl border border-transparent px-6 py-3 text-sm font-semibold transition hover:-translate-y-0.5; }
+  .btn-primary { @apply bg-brand text-white shadow-[0_8px_20px_rgba(192,0,0,0.25)] hover:bg-brandDark; }
+  .btn-outline { @apply border-line bg-surface text-ink hover:border-brand hover:text-brand; }
+  .field { @apply w-full rounded-lg border border-line bg-surface px-3.5 py-2.5 text-sm text-ink placeholder:text-muted; }
+  .card { @apply rounded-2xl border border-line bg-surface shadow-card; }
+  .prose-im p { @apply mb-4 text-muted; }
+  .prose-im h2 { @apply mb-4 text-2xl font-bold text-ink; }
+  .prose-im h3 { @apply mb-2 mt-8 text-lg font-semibold text-ink; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+}
