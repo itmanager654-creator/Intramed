@@ -26,21 +26,15 @@ git push -u origin main      # password ki jagah GitHub Personal Access Token de
 5. Project > **Settings > Environment Variables** mein ye add karein, phir **Redeploy**:
    - `ADMIN_PASSWORD` = apna strong password
    - `ADMIN_SECRET` = koi lambi random string
-   - Notifications ke liye neeche wale variables (step 4)
 
 Admin panel: `https://yourdomain/admin/`
 
-## 4. Inquiry notification (phone par foran alert)
-**Telegram (sabse behtar, free):**
-1. Telegram mein **@BotFather** kholen > `/newbot` > naam dein > **token** copy karein -> `TELEGRAM_BOT_TOKEN`.
-2. Apne naye bot ko koi bhi message bhejein (Start dabayein).
-3. Browser mein kholen: `https://api.telegram.org/bot<TOKEN>/getUpdates` — `"chat":{"id": 123456789` wala number -> `TELEGRAM_CHAT_ID`.
-   Kai logon ko alert chahiye to ids comma se alag karein: `111,222`.
-
-**Email (optional):** resend.com par free account > API key -> `RESEND_API_KEY`, aur `NOTIFY_EMAIL` = jis email par alert chahiye.
-Apna domain verify kar lein to `RESEND_FROM` mein `IntraMed <info@intramedsolution.com>` lagayen.
-
-Admin dashboard khula ho to har 30 second mein naye inquiries check hote hain ("Enable browser alerts" dabayein).
+## 4. Inquiry notification (browser / phone push)
+Telegram aur email ki zaroorat nahi. Sirf Chrome ka push notification:
+1. `node scripts/gen-vapid.mjs` chalayen, jo 2 lines aayen (`VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`) Vercel > Environment Variables mein daalein, Redeploy.
+2. Neon SQL Editor mein `schema.sql` Run karein (isme `push_subs` table hai).
+3. Phone ke Chrome mein `/admin/` > **Enable notifications on this device** > Allow.
+4. **Send test** dabayein.
 
 ## 5. Domain (CreativeOn) ko Vercel par lagana
 1. Vercel > Project > **Settings > Domains** > `intramedsolution.com` aur `www.intramedsolution.com` add karein.
@@ -75,15 +69,7 @@ Ye Firebase se sirf **parhta** hai (kuch delete nahi karta): catalog, gallery au
 aur base64 photos asli image files ban kar Vercel Blob mein jati hain. Dobara chalayen to duplicate nahi bante.
 Agar "HTTP 403" aaye to Firestore rules read allow nahi kar rahi.
 
-## 8. Update (content editor, phone notifications, About page)
-1. **Neon SQL Editor** mein `schema.sql` dobara poora paste karke Run karein (safe hai, sirf 2 nayi tables banti hain: `site_content`, `push_subs`).
-2. Phone push keys banayein (Termux mein, `npm install` ki zaroorat nahi):
-   ```bash
-   node scripts/gen-vapid.mjs
-   ```
-   Jo 2 lines aayen (`VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`) Vercel > Settings > Environment Variables mein daalein. **Redeploy** karein.
-3. `/admin/` kholen > **Inquiry notifications** box:
-   - **Send test** dabayein: har channel (Telegram / Phone push / Email) ka asli natija likha aayega (kya masla hai wo bhi).
-   - Phone par **Enable phone notifications** dabayein aur Allow karein. Iske baad site band ho tab bhi alert aayega.
-4. **Website text** tab: poori website ke headings, paragraphs, contact info, WhatsApp number, address, Google (SEO) titles yahan se badlein.
-5. Optional: Google Search Console ka verification code `GOOGLE_SITE_VERIFICATION` mein daalein.
+## 8. Update notes
+- Neon SQL Editor mein `schema.sql` dobara poora Run karein (safe hai).
+- Product add karte hi us ke liye "What is ... / For which purpose is ... used?" paragraphs khud ban jate hain (`lib/productInfo.js`).
+- Admin > **Website text** tab se poori website ka text aur contact info badlein.

@@ -110,6 +110,17 @@ export default async function Home() {
         </div>
       </section>
 
+      <section className="section bg-alt">
+        <div className="wrap">
+          <h2 className="text-3xl font-bold">{t('home.vmpHeading')}</h2>
+          <div className="mt-8 grid gap-5 md:grid-cols-3">
+            <div className="card p-6"><h3 className="mb-2 text-xl font-semibold">Our vision</h3><p className="text-sm text-muted">{t('about.vision')}</p></div>
+            <div className="card p-6"><h3 className="mb-2 text-xl font-semibold">Our mission</h3><p className="text-sm text-muted">{t('about.mission')}</p></div>
+            <div className="card p-6"><h3 className="mb-2 text-xl font-semibold">Our promise</h3><p className="text-sm text-muted">{t('about.promise')}</p></div>
+          </div>
+        </div>
+      </section>
+
       {partners.length > 0 && (
         <section className="section bg-alt">
           <div className="wrap">

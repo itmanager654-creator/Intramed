@@ -30,8 +30,8 @@ export default function AdminNotify({ flash }) {
       if (old) await old.unsubscribe();
       const sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: b64ToUint8(info.publicKey) });
       const r = await fetch('/api/admin/push/', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(sub.toJSON()) });
-      if (!r.ok) throw new Error('Could not save this device');
-      flash('Phone notifications enabled on this device');
+      if (!r.ok) { const j = await r.json().catch(() => ({})); throw new Error(j.error || 'Could not save this device'); }
+      flash('Notifications enabled on this device');
       await load();
     } catch (e) { flash(e.message); }
     setBusy(false);
@@ -52,9 +52,10 @@ export default function AdminNotify({ flash }) {
     <div className="card mb-6 p-4">
       <div className="flex flex-wrap items-center gap-3">
         <h2 className="font-bold">Inquiry notifications</h2>
-        {info && <span className="text-xs text-muted">{dot(info.telegram)} Telegram &nbsp; {dot(info.push)} Phone push ({info.subscribers} device{info.subscribers === 1 ? '' : 's'}) &nbsp; {dot(info.email)} Email</span>}
+        {info && <span className="text-xs text-muted">{dot(info.push && !info.tableMissing && info.subscribers > 0)} Browser notifications ({info.subscribers} device{info.subscribers === 1 ? '' : 's'})</span>}
+        {info?.tableMissing && <p className="w-full text-sm font-medium text-brand">Database table missing: run schema.sql in Neon SQL Editor, then reload this page.</p>}
         <div className="ml-auto flex gap-2">
-          <button disabled={busy} onClick={enable} className="btn btn-primary !px-4 !py-2 disabled:opacity-60">Enable phone notifications</button>
+          <button disabled={busy} onClick={enable} className="btn btn-primary !px-4 !py-2 disabled:opacity-60">Enable notifications on this device</button>
           <button disabled={busy} onClick={test} className="btn btn-outline !px-4 !py-2 disabled:opacity-60">Send test</button>
         </div>
       </div>

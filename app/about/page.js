@@ -44,9 +44,10 @@ export default async function About() {
       </section>
 
       <section className="section bg-alt">
-        <div className="wrap grid gap-6 md:grid-cols-2">
+        <div className="wrap grid gap-6 md:grid-cols-3">
           <div className="card p-6"><h2 className="mb-2 text-xl font-bold">Our vision</h2><p className="text-muted">{t('about.vision')}</p></div>
           <div className="card p-6"><h2 className="mb-2 text-xl font-bold">Our mission</h2><p className="text-muted">{t('about.mission')}</p></div>
+          <div className="card p-6"><h2 className="mb-2 text-xl font-bold">Our promise</h2><p className="text-muted">{t('about.promise')}</p></div>
         </div>
       </section>
 
