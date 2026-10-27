@@ -1,19 +1,20 @@
 'use client';
 import { useState } from 'react';
 
-export default function InquiryForm({ product = '', compact = false }) {
+export default function InquiryForm({ product = '', compact = false, phone = '' }) {
   const [state, setState] = useState({ status: 'idle', error: '' });
 
   async function onSubmit(e) {
     e.preventDefault();
+    const form = e.currentTarget; // keep a reference: currentTarget is null after an await
     setState({ status: 'sending', error: '' });
-    const data = Object.fromEntries(new FormData(e.currentTarget));
+    const data = Object.fromEntries(new FormData(form));
     try {
       const res = await fetch('/api/inquiries/', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
       const out = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(out.error || 'Something went wrong');
+      form.reset();
       setState({ status: 'sent', error: '' });
-      e.currentTarget.reset();
     } catch (err) {
       setState({ status: 'error', error: err.message });
     }
@@ -23,7 +24,7 @@ export default function InquiryForm({ product = '', compact = false }) {
     return (
       <div className="card p-6 text-center" role="status">
         <h3 className="text-lg font-semibold">Inquiry sent</h3>
-        <p className="mt-1 text-sm text-muted">Our team will contact you shortly. For urgent orders call 0346 4711440.</p>
+        <p className="mt-1 text-sm text-muted">Our team will contact you shortly.{phone ? ` For urgent orders call ${phone}.` : ''}</p>
       </div>
     );
   }

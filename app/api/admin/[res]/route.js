@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { isAdmin } from '@/lib/auth';
+import { allFields, getOverrides } from '@/lib/content';
 
 const slugify = (s) => String(s).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 80) || 'item';
 const no = (m, s = 400) => NextResponse.json({ error: m }, { status: s });
@@ -17,6 +18,10 @@ async function uniqueSlug(sql, category, name, ignoreId = 0) {
 
 export async function GET(_req, { params }) {
   if (!(await isAdmin())) return no('Unauthorized', 401);
+  if (params.res === 'content') {
+    const over = await getOverrides();
+    return NextResponse.json(allFields().map(([k, g, l, t, d]) => ({ k, g, l, t, d, v: over[k] !== undefined && over[k] !== '' ? over[k] : d })));
+  }
   const sql = db();
   if (params.res === 'products') return NextResponse.json(await sql`select * from products order by category, sort, id`);
   if (params.res === 'gallery') return NextResponse.json(await sql`select * from gallery order by id desc`);
@@ -63,6 +68,17 @@ export async function POST(req, { params }) {
 export async function PUT(req, { params }) {
   if (!(await isAdmin())) return no('Unauthorized', 401);
   const sql = db(); const b = await req.json();
+  if (params.res === 'content') {
+    const allowed = new Set(allFields().map((f) => f[0]));
+    for (const [k, v] of Object.entries(b.values || {})) {
+      if (!allowed.has(k)) continue;
+      const val = String(v ?? '').slice(0, 3000);
+      if (val.trim() === '') await sql`delete from site_content where key = ${k}`;
+      else await sql`insert into site_content (key, value, updated_at) values (${k}, ${val}, now())
+        on conflict (key) do update set value = excluded.value, updated_at = now()`;
+    }
+    return NextResponse.json({ ok: true });
+  }
   if (params.res !== 'products' || !b.id) return no('Not found', 404);
   const slug = await uniqueSlug(sql, b.category, b.name, Number(b.id));
   const r = await sql`update products set category = ${b.category}, slug = ${slug}, name = ${b.name.trim()}, spec = ${b.spec || ''},

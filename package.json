@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "migrate": "node scripts/migrate-from-firebase.mjs"
+    "migrate": "node scripts/migrate-from-firebase.mjs",
+    "vapid": "node scripts/gen-vapid.mjs"
   },
   "dependencies": {
     "@neondatabase/serverless": "^0.10.4",
@@ -14,7 +15,8 @@
     "jose": "^5.9.6",
     "next": "^14.2.15",
     "react": "^18.3.1",
-    "react-dom": "^18.3.1"
+    "react-dom": "^18.3.1",
+    "web-push": "^3.6.7"
   },
   "devDependencies": {
     "autoprefixer": "^10.4.20",

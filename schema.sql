@@ -49,3 +49,18 @@ create table if not exists clients (
   logo_url text default '',
   sort int default 0
 );
+
+-- Editable website text (admin: "Website text" tab)
+create table if not exists site_content (
+  key text primary key,
+  value text not null default '',
+  updated_at timestamptz default now()
+);
+
+-- Phone notification subscriptions (admin: "Enable phone notifications")
+create table if not exists push_subs (
+  endpoint text primary key,
+  p256dh text not null,
+  auth text not null,
+  created_at timestamptz default now()
+);

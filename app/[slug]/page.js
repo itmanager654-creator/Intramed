@@ -2,43 +2,51 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { query } from '@/lib/db';
 import { CATEGORIES, getCategory, categoryFaqs } from '@/lib/categories';
+import { getContent } from '@/lib/content';
+import { buildMeta } from '@/lib/seo';
 import { SITE } from '@/lib/site';
+import OrganArt from '@/components/OrganArt';
 import JsonLd from '@/components/JsonLd';
 
 export const dynamic = 'force-dynamic';
 
-export function generateMetadata({ params }) {
+export async function generateMetadata({ params }) {
   const c = getCategory(params.slug);
   if (!c) return {};
-  return {
-    title: `${c.name} Devices Supplier & Distributor in Pakistan | Lahore, Karachi, Islamabad – IntraMed Solution`,
-    description: `${c.name} devices supplier & distributor in Pakistan — based in Lahore, delivering to Karachi, Islamabad, Rawalpindi, Faisalabad, Multan, Peshawar & nationwide. Sterile disposable ${c.name.toLowerCase()} devices for hospitals.`,
-    alternates: { canonical: `/${c.slug}/` },
-  };
+  const t = await getContent();
+  return buildMeta({ title: t(`cat.${c.slug}.seoTitle`), description: t(`cat.${c.slug}.seoDesc`), path: `/${c.slug}/` });
 }
 
 export default async function CategoryPage({ params }) {
   const c = getCategory(params.slug);
   if (!c) notFound();
-  const n = c.name.toLowerCase();
+  const t = await getContent();
+  const k = (s) => t(`cat.${c.slug}.${s}`);
   const products = await query`select id, slug, name, spec, image_url from products where category = ${c.key} order by sort, id`;
-  const faqs = categoryFaqs(c);
+  const faqs = categoryFaqs(c, t('contact.phone'));
   const url = `${SITE.url}/${c.slug}/`;
+  const words = k('h1').split(' ');
+  const last = words.pop();
+  const items = k('items').split('\n').map((s) => s.trim()).filter(Boolean);
 
   return (
     <>
       <section className="border-b border-line bg-alt">
-        <div className="wrap py-12 md:py-16">
-          <nav aria-label="Breadcrumb" className="mb-3 text-sm text-muted"><Link href="/" className="hover:text-brand">Home</Link> / {c.name}</nav>
-          <h1 className="text-3xl font-extrabold md:text-5xl">{c.name} Devices Supplier & Distributor in <span className="text-brand">Pakistan</span></h1>
-          <p className="mt-4 max-w-2xl text-lg text-muted">{c.lead}</p>
+        <div className="wrap grid items-center gap-8 py-12 md:grid-cols-[1.4fr_1fr] md:py-16">
+          <div>
+            <nav aria-label="Breadcrumb" className="mb-3 text-sm text-muted"><Link href="/" className="hover:text-brand">Home</Link> / {c.name}</nav>
+            <h1 className="text-3xl font-extrabold md:text-5xl">{words.join(' ')} <span className="text-brand">{last}</span></h1>
+            <p className="mt-4 max-w-2xl text-lg text-muted">{k('lead')}</p>
+            <a href="#catalog" className="btn btn-primary mt-6">View catalog</a>
+          </div>
+          <OrganArt type={c.slug} className="mx-auto w-full max-w-[260px] md:max-w-[340px]" />
         </div>
       </section>
 
       {/* Catalog first, so visitors reach products immediately */}
       <section className="section" id="catalog">
         <div className="wrap">
-          <div className="mb-4 flex items-baseline justify-between"><h2 className="text-2xl font-bold">{c.name} product catalog</h2><span className="text-sm text-muted">{products.length} products</span></div>
+          <div className="mb-4 flex items-baseline justify-between"><h2 className="text-2xl font-bold">{k('catalogHeading')}</h2><span className="text-sm text-muted">{products.length} products</span></div>
           {products.length === 0 ? (
             <div className="card p-6 text-center"><p className="font-semibold">Catalog is being updated</p><p className="text-sm text-muted">Please <Link href="/contact/" className="text-brand underline">contact us</Link> for current availability.</p></div>
           ) : (
@@ -63,15 +71,12 @@ export default async function CategoryPage({ params }) {
 
       <section className="section bg-alt">
         <div className="wrap prose-im max-w-3xl">
-          <h2>{c.name} Devices in Lahore, Pakistan</h2>
-          <p>IntraMed Solution is a Lahore-based supplier of disposable {n} devices, serving {c.users} across Pakistan. Every device is sterile, single-use and sourced to the specifications clinicians already trust, with ready stock and on-time delivery across Lahore and nationwide.</p>
-          <ul className="mb-4 list-disc pl-5 text-muted">{c.items.map((i) => <li key={i}>{i}</li>)}</ul>
-          <h3>{c.name} Devices Supplier in Pakistan</h3>
-          <p>As a dedicated {n} devices supplier in Pakistan, IntraMed Solution delivers to hospitals, private clinics and government institutions in {SITE.cities.slice(0, 7).join(', ')} and beyond. Nationwide orders are dispatched within 2-3 business days so {c.users} never run short of essential disposables.</p>
-          <h3>{c.name} Devices Supplier in Lahore</h3>
-          <p>In Lahore we hold ready stock of {n} devices for same-day or next-day delivery, so local hospitals can restock without long lead times.</p>
-          <h3>{c.name} Devices Distributor in Pakistan</h3>
-          <p>Beyond direct supply, we work as a {n} devices distributor in Pakistan, partnering with international manufacturers to bring authentic, regulatory-compliant products to the local market, with consistent pricing, batch traceability and dedicated after-sales support.</p>
+          <h2>{k('introHeading')}</h2>
+          <p>{k('intro')}</p>
+          {items.length > 0 && <ul className="mb-4 list-disc pl-5 text-muted">{items.map((i) => <li key={i}>{i}</li>)}</ul>}
+          <h3>{k('pkHeading')}</h3><p>{k('pk')}</p>
+          <h3>{k('lhHeading')}</h3><p>{k('lh')}</p>
+          <h3>{k('dsHeading')}</h3><p>{k('ds')}</p>
         </div>
       </section>
 
@@ -87,7 +92,7 @@ export default async function CategoryPage({ params }) {
       <JsonLd data={{ '@context': 'https://schema.org', '@type': 'BreadcrumbList', itemListElement: [
         { '@type': 'ListItem', position: 1, name: 'Home', item: SITE.url + '/' },
         { '@type': 'ListItem', position: 2, name: `${c.name} Devices`, item: url }] }} />
-      <JsonLd data={{ '@context': 'https://schema.org', '@type': 'CollectionPage', name: `${c.name} Devices Catalog`, url,
+      <JsonLd data={{ '@context': 'https://schema.org', '@type': 'CollectionPage', name: `${c.name} Devices Catalog`, url, about: { '@type': 'Thing', name: `${c.name} devices` }, isPartOf: { '@id': `${SITE.url}/#website` }, publisher: { '@id': `${SITE.url}/#organization` },
         mainEntity: { '@type': 'ItemList', itemListElement: products.map((p, i) => ({ '@type': 'ListItem', position: i + 1, url: `${url}${p.slug}/`, name: p.name })) } }} />
       <JsonLd data={{ '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: faqs.map(([q, a]) => ({ '@type': 'Question', name: q, acceptedAnswer: { '@type': 'Answer', text: a } })) }} />
     </>

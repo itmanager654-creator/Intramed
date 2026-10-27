@@ -3,6 +3,8 @@ import { notFound } from 'next/navigation';
 import { query } from '@/lib/db';
 import { getCategory } from '@/lib/categories';
 import { SITE } from '@/lib/site';
+import { getContent, contactOf } from '@/lib/content';
+import { buildMeta } from '@/lib/seo';
 import InquiryForm from '@/components/InquiryForm';
 import JsonLd from '@/components/JsonLd';
 
@@ -19,12 +21,12 @@ export async function generateMetadata({ params }) {
   const { c, p } = await load(params);
   if (!p) return {};
   const desc = (p.description || p.spec || `${p.name} — sterile, single-use ${c.name.toLowerCase()} device.`).slice(0, 150);
-  return {
+  return buildMeta({
     title: `${p.name} Supplier & Distributor in Pakistan | Lahore – IntraMed Solution`,
     description: `${p.name} supplier in Pakistan. ${desc} Delivery in Lahore, Karachi, Islamabad & nationwide.`,
-    alternates: { canonical: `/${c.slug}/${p.slug}/` },
-    openGraph: p.image_url ? { images: [p.image_url] } : undefined,
-  };
+    path: `/${c.slug}/${p.slug}/`,
+    image: p.image_url || undefined,
+  });
 }
 
 export default async function ProductPage({ params }) {
@@ -32,6 +34,7 @@ export default async function ProductPage({ params }) {
   if (!c || !p) notFound();
   const related = await query`select slug, name from products where category = ${c.key} and id <> ${p.id} order by sort, id limit 6`;
   const url = `${SITE.url}/${c.slug}/${p.slug}/`;
+  const ct = contactOf(await getContent());
 
   return (
     <>
@@ -50,14 +53,14 @@ export default async function ProductPage({ params }) {
             {p.description && <p className="mt-4 whitespace-pre-line text-muted">{p.description}</p>}
             <p className="mt-4 text-muted">Sterile, single-use and supplied from Lahore to hospitals and clinics across Pakistan, with delivery in 2-3 business days nationwide.</p>
             <div className="mt-6 flex flex-wrap gap-3">
-              <a href={`https://wa.me/${SITE.whatsapp}?text=${encodeURIComponent(`Hello, I need a quotation for: ${p.name}`)}`} className="btn btn-primary">WhatsApp for quotation</a>
-              <a href={`tel:${SITE.tel}`} className="btn btn-outline">Call {SITE.phone}</a>
+              <a href={`https://wa.me/${ct.wa}?text=${encodeURIComponent(`Hello, I need a quotation for: ${p.name}`)}`} className="btn btn-primary">WhatsApp for quotation</a>
+              <a href={`tel:${ct.tel || ct.phone}`} className="btn btn-outline">Call {ct.phone}</a>
             </div>
           </div>
         </div>
 
         <div className="mt-12 grid gap-8 md:grid-cols-2">
-          <div><h2 className="mb-3 text-xl font-bold">Request a quotation</h2><InquiryForm product={p.name} compact /></div>
+          <div><h2 className="mb-3 text-xl font-bold">Request a quotation</h2><InquiryForm product={p.name} compact phone={ct.phone} /></div>
           {related.length > 0 && (
             <div><h2 className="mb-3 text-xl font-bold">More {c.name.toLowerCase()} devices</h2>
               <ul className="grid gap-2">{related.map((r) => <li key={r.slug}><Link href={`/${c.slug}/${r.slug}/`} className="text-brand hover:underline">{r.name}</Link></li>)}</ul>
@@ -67,7 +70,7 @@ export default async function ProductPage({ params }) {
       </div>
 
       <JsonLd data={{ '@context': 'https://schema.org', '@type': 'Product', name: p.name, description: p.description || p.spec || `${p.name} supplied in Pakistan by ${SITE.name}.`, image: p.image_url ? [p.image_url] : undefined, category: `${c.name} devices`, url,
-        brand: { '@type': 'Organization', name: SITE.name }, sku: `IM-${p.id}` }} />
+        brand: { '@type': 'Organization', name: SITE.name }, manufacturer: { '@id': `${SITE.url}/#organization` }, sku: `IM-${p.id}`, areaServed: 'PK' }} />
       <JsonLd data={{ '@context': 'https://schema.org', '@type': 'BreadcrumbList', itemListElement: [
         { '@type': 'ListItem', position: 1, name: 'Home', item: SITE.url + '/' },
         { '@type': 'ListItem', position: 2, name: `${c.name} Devices`, item: `${SITE.url}/${c.slug}/` },

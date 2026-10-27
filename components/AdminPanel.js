@@ -2,6 +2,8 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { CATEGORIES } from '@/lib/categories';
 import AdminHome from '@/components/AdminHome';
+import AdminContent from '@/components/AdminContent';
+import AdminNotify from '@/components/AdminNotify';
 
 const api = async (res, method = 'GET', body, qs = '') => {
   const r = await fetch(`/api/admin/${res}/${qs}`, { method, headers: { 'Content-Type': 'application/json' }, body: body ? JSON.stringify(body) : undefined });
@@ -29,7 +31,6 @@ export default function AdminPanel() {
   const [gal, setGal] = useState({ category: 'Cardiology', caption: '' });
   const [msg, setMsg] = useState('');
   const [busy, setBusy] = useState(false);
-  const [canNotify, setCanNotify] = useState(false);
   const seen = useRef(null);
 
   const loadAll = useCallback(async () => {
@@ -38,7 +39,7 @@ export default function AdminPanel() {
       setProducts(p); setGallery(g); setInquiries(i);
     } catch (e) { setMsg(e.message); }
   }, []);
-  useEffect(() => { loadAll(); setCanNotify('Notification' in window); }, [loadAll]);
+  useEffect(() => { loadAll(); }, [loadAll]);
 
   // Check for new inquiries every 30s while the dashboard is open
   useEffect(() => {
@@ -92,11 +93,11 @@ export default function AdminPanel() {
       <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-2xl font-bold">Admin dashboard</h1>
         <div className="flex gap-2">
-          {canNotify && <button className="btn btn-outline !py-2" onClick={() => Notification.requestPermission().then((p) => flash(p === 'granted' ? 'Browser alerts on' : 'Alerts blocked'))}>Enable browser alerts</button>}
           <button className="btn btn-outline !py-2" onClick={logout}>Log out</button>
         </div>
       </div>
-      <div className="mb-6 flex flex-wrap gap-2">{tabBtn('inquiries', `Inquiries${newCount ? ` (${newCount} new)` : ''}`)}{tabBtn('products', `Products (${products.length})`)}{tabBtn('gallery', `Gallery (${gallery.length})`)}{tabBtn('home', 'Homepage')}</div>
+      <AdminNotify flash={flash} />
+      <div className="mb-6 flex flex-wrap gap-2">{tabBtn('inquiries', `Inquiries${newCount ? ` (${newCount} new)` : ''}`)}{tabBtn('products', `Products (${products.length})`)}{tabBtn('gallery', `Gallery (${gallery.length})`)}{tabBtn('home', 'Homepage')}{tabBtn('content', 'Website text')}</div>
       {msg && <p role="status" className="mb-4 rounded-lg bg-tint px-4 py-2 text-sm font-medium text-brand">{msg}</p>}
 
       {tab === 'inquiries' && (
@@ -151,6 +152,7 @@ export default function AdminPanel() {
       )}
 
       {tab === 'home' && <AdminHome flash={flash} />}
+      {tab === 'content' && <AdminContent flash={flash} />}
 
       {tab === 'gallery' && (
         <div>

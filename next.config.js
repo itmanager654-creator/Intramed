@@ -1,6 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  poweredByHeader: false,
   // Same URL style as the old site: /cardiology-devices/
   trailingSlash: true,
   async redirects() {

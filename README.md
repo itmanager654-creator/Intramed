@@ -74,3 +74,16 @@ npm run migrate
 Ye Firebase se sirf **parhta** hai (kuch delete nahi karta): catalog, gallery aur purani inquiries naye system mein copy hoti hain,
 aur base64 photos asli image files ban kar Vercel Blob mein jati hain. Dobara chalayen to duplicate nahi bante.
 Agar "HTTP 403" aaye to Firestore rules read allow nahi kar rahi.
+
+## 8. Update (content editor, phone notifications, About page)
+1. **Neon SQL Editor** mein `schema.sql` dobara poora paste karke Run karein (safe hai, sirf 2 nayi tables banti hain: `site_content`, `push_subs`).
+2. Phone push keys banayein (Termux mein, `npm install` ki zaroorat nahi):
+   ```bash
+   node scripts/gen-vapid.mjs
+   ```
+   Jo 2 lines aayen (`VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`) Vercel > Settings > Environment Variables mein daalein. **Redeploy** karein.
+3. `/admin/` kholen > **Inquiry notifications** box:
+   - **Send test** dabayein: har channel (Telegram / Phone push / Email) ka asli natija likha aayega (kya masla hai wo bhi).
+   - Phone par **Enable phone notifications** dabayein aur Allow karein. Iske baad site band ho tab bhi alert aayega.
+4. **Website text** tab: poori website ke headings, paragraphs, contact info, WhatsApp number, address, Google (SEO) titles yahan se badlein.
+5. Optional: Google Search Console ka verification code `GOOGLE_SITE_VERIFICATION` mein daalein.

@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { notifyInquiry } from '@/lib/notify';
+import { getContent } from '@/lib/content';
 
 const clean = (v, n) => String(v ?? '').trim().slice(0, n);
 
@@ -19,6 +20,7 @@ export async function POST(req) {
     return NextResponse.json({ ok: true });
   } catch (e) {
     console.error(e);
-    return NextResponse.json({ error: 'Could not send. Please call 0346 4711440.' }, { status: 500 });
+    const phone = (await getContent())('contact.phone');
+    return NextResponse.json({ error: `Could not send. Please call ${phone}.` }, { status: 500 });
   }
 }

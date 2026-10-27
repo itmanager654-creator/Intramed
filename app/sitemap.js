@@ -9,6 +9,7 @@ export default async function sitemap() {
   const base = [
     { url: `${SITE.url}/`, priority: 1 },
     ...CATEGORIES.map((c) => ({ url: `${SITE.url}/${c.slug}/`, priority: 0.9 })),
+    { url: `${SITE.url}/about/`, priority: 0.7 },
     { url: `${SITE.url}/gallery/`, priority: 0.5 },
     { url: `${SITE.url}/contact/`, priority: 0.6 },
   ].map((e) => ({ ...e, lastModified: now, changeFrequency: 'weekly' }));
