@@ -3,8 +3,8 @@ import { useCallback, useEffect, useState } from 'react';
 
 const KINDS = {
   featured: { label: 'Featured products', fields: [['title', 'Title'], ['tag', 'Tag (e.g. Cardiology)'], ['description', 'Description']], img: 'image_url', name: 'title' },
-  partners: { label: 'Partners', fields: [['name', 'Name'], ['description', 'Short description']], img: 'logo_url', name: 'name' },
-  clients: { label: 'Clients', fields: [['label', 'Client name']], img: 'logo_url', name: 'label' },
+  partners: { label: 'Manufacturers / Partners', fields: [['name', 'Name'], ['description', 'Short description']], img: 'logo_url', name: 'name' },
+  clients: { label: 'Clients (logos)', fields: [['label', 'Client name']], img: 'logo_url', name: 'label' },
 };
 
 async function call(res, method = 'GET', body, qs = '') {
@@ -56,7 +56,7 @@ function Section({ kind, flash }) {
       <ul className="grid gap-2">
         {rows.map((r) => (
           <li key={r.id} className="flex items-center gap-3 rounded-lg border border-line p-2 text-sm">
-            {r[cfg.img] ? /* eslint-disable-next-line @next/next/no-img-element */ <img src={r[cfg.img]} alt="" className="h-10 w-10 rounded object-cover" /> : <span className="grid h-10 w-10 place-items-center rounded bg-surface2 text-xs text-muted">—</span>}
+            {r[cfg.img] ? /* eslint-disable-next-line @next/next/no-img-element */ <img src={r[cfg.img]} alt="" className="h-10 w-10 rounded object-contain" /> : <span className="grid h-10 w-10 place-items-center rounded bg-surface2 text-xs text-muted">—</span>}
             <span className="flex-1 font-medium">{r[cfg.name]}</span>
             <button className="text-muted hover:text-brand" onClick={() => del(r.id)}>Delete</button>
           </li>

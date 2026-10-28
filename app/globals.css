@@ -35,6 +35,32 @@ html.dark {
   .prose-im h3 { @apply mb-2 mt-8 text-lg font-semibold text-ink; }
 }
 
+/* ---------- Animations ---------- */
+@keyframes pageIn { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+.page-in { animation: pageIn 0.45s ease-out both; }
+
+/* Scroll reveal: hidden state only applies when JS is running (class "rv" is set in <head>); fallback shows it after 3s anyway */
+@keyframes rvFallback { to { opacity: 1; transform: none; } }
+.rv .reveal { opacity: 0; transform: translateY(28px); transition: opacity 0.7s ease, transform 0.7s ease; transition-delay: var(--d, 0ms); animation: rvFallback 0s linear 3s forwards; }
+.rv .reveal.in { opacity: 1; transform: none; }
+
+@keyframes floaty { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+.floaty { animation: floaty 5s ease-in-out infinite; animation-delay: var(--d, 0ms); }
+@keyframes drift { 0%, 100% { transform: translate(0, 0) scale(1); } 50% { transform: translate(30px, -20px) scale(1.08); } }
+.blob { animation: drift 14s ease-in-out infinite; }
+@keyframes ecg { 0% { stroke-dashoffset: 520; } 55%, 100% { stroke-dashoffset: 0; } }
+.ecg-line { stroke-dasharray: 520; stroke-dashoffset: 520; animation: ecg 3.2s ease-in-out infinite; }
+@keyframes beat { 0%, 100% { transform: scale(1); } 14% { transform: scale(1.18); } 28% { transform: scale(1); } 42% { transform: scale(1.12); } 70% { transform: scale(1); } }
+.heartbeat { animation: beat 1.8s ease-in-out infinite; transform-origin: center; }
+@keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+.marquee { overflow: hidden; -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent); mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent); }
+.marquee-track { display: flex; width: max-content; animation: marquee 35s linear infinite; }
+.marquee:hover .marquee-track { animation-play-state: paused; }
+.hero-bg { background: radial-gradient(60% 80% at 90% 0%, var(--accent-tint), transparent 60%), radial-gradient(50% 60% at 0% 100%, var(--accent-tint), transparent 60%), var(--bg-alt); }
+.stat-band { background: linear-gradient(120deg, var(--accent-dark), var(--accent)); }
+
 @media (prefers-reduced-motion: reduce) {
+  .rv .reveal { opacity: 1 !important; transform: none !important; }
+  .marquee { overflow-x: auto; }
   *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
 }

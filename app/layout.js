@@ -4,6 +4,7 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import JsonLd from '@/components/JsonLd';
 import FloatingWhatsApp from '@/components/FloatingWhatsApp';
+import ScrollReveal from '@/components/ScrollReveal';
 import { SITE } from '@/lib/site';
 import { getContent, contactOf } from '@/lib/content';
 
@@ -23,7 +24,7 @@ export const metadata = {
 };
 
 // Light theme is the default. Dark only if the visitor chose it with the toggle.
-const themeInit = `try{if(localStorage.getItem('theme')==='dark')document.documentElement.classList.add('dark')}catch(e){}`;
+const themeInit = `document.documentElement.classList.add('rv');try{if(localStorage.getItem('theme')==='dark')document.documentElement.classList.add('dark')}catch(e){}`;
 
 export default async function RootLayout({ children }) {
   const t = await getContent();
@@ -70,6 +71,7 @@ export default async function RootLayout({ children }) {
         <Header />
         <main>{children}</main>
         <Footer />
+        <ScrollReveal />
         <FloatingWhatsApp number={ct.wa} message={ct.waMsg} />
         <JsonLd data={graph} />
       </body>
