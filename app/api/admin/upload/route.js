@@ -16,6 +16,7 @@ export async function POST(req) {
     return NextResponse.json({ url: blob.url });
   } catch (e) {
     console.error(e);
+    if (/private/i.test(e?.message || '')) return NextResponse.json({ error: 'Your Vercel Blob store is set to PRIVATE. Create a new Blob store with PUBLIC access in Vercel > Storage and connect it to this project, then redeploy.' }, { status: 500 });
     return NextResponse.json({ error: `Upload failed: ${e?.message || 'unknown error'}. Is Vercel Blob connected (BLOB_READ_WRITE_TOKEN)?` }, { status: 500 });
   }
 }

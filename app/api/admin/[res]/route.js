@@ -16,7 +16,7 @@ async function uniqueSlug(sql, category, name, ignoreId = 0) {
   }
 }
 
-export async function GET(_req, { params }) {
+async function _GET(_req, { params }) {
   if (!(await isAdmin())) return no('Unauthorized', 401);
   if (params.res === 'content') {
     const over = await getOverrides();
@@ -32,7 +32,7 @@ export async function GET(_req, { params }) {
   return no('Not found', 404);
 }
 
-export async function POST(req, { params }) {
+async function _POST(req, { params }) {
   if (!(await isAdmin())) return no('Unauthorized', 401);
   const sql = db(); const b = await req.json();
   if (params.res === 'products') {
@@ -65,7 +65,7 @@ export async function POST(req, { params }) {
   return no('Not found', 404);
 }
 
-export async function PUT(req, { params }) {
+async function _PUT(req, { params }) {
   if (!(await isAdmin())) return no('Unauthorized', 401);
   const sql = db(); const b = await req.json();
   if (params.res === 'content') {
@@ -74,8 +74,10 @@ export async function PUT(req, { params }) {
       if (!allowed.has(k)) continue;
       const val = String(v ?? '').slice(0, 3000);
       if (val.trim() === '') await sql`delete from site_content where key = ${k}`;
-      else await sql`insert into site_content (key, value, updated_at) values (${k}, ${val}, now())
-        on conflict (key) do update set value = excluded.value, updated_at = now()`;
+      else {
+        const upd = await sql`update site_content set value = ${val} where key = ${k} returning key`;
+        if (!upd.length) await sql`insert into site_content (key, value) values (${k}, ${val})`;
+      }
     }
     return NextResponse.json({ ok: true });
   }
@@ -93,7 +95,7 @@ export async function PUT(req, { params }) {
   return NextResponse.json(r[0] || {});
 }
 
-export async function PATCH(req, { params }) {
+async function _PATCH(req, { params }) {
   if (!(await isAdmin())) return no('Unauthorized', 401);
   const b = await req.json();
   if (params.res !== 'inquiries') return no('Not found', 404);
@@ -101,7 +103,7 @@ export async function PATCH(req, { params }) {
   return NextResponse.json({ ok: true });
 }
 
-export async function DELETE(req, { params }) {
+async function _DELETE(req, { params }) {
   if (!(await isAdmin())) return no('Unauthorized', 401);
   const sql = db(); const id = Number(new URL(req.url).searchParams.get('id'));
   if (!id) return no('Missing id');
@@ -114,3 +116,13 @@ export async function DELETE(req, { params }) {
   else return no('Not found', 404);
   return NextResponse.json({ ok: true });
 }
+
+const safe = (fn) => async (req, ctx) => {
+  try { return await fn(req, ctx); }
+  catch (e) { console.error(e); return no(e?.message || 'Server error', 500); }
+};
+export const GET = safe(_GET);
+export const POST = safe(_POST);
+export const PUT = safe(_PUT);
+export const PATCH = safe(_PATCH);
+export const DELETE = safe(_DELETE);
