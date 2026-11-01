@@ -3,7 +3,7 @@ import { useCallback, useEffect, useState } from 'react';
 
 const KINDS = {
   featured: { label: 'Featured products', fields: [['title', 'Title'], ['tag', 'Tag (e.g. Cardiology)'], ['description', 'Description']], img: 'image_url', name: 'title' },
-  partners: { label: 'Manufacturers / Partners', fields: [['name', 'Name'], ['description', 'Short description']], img: 'logo_url', name: 'name' },
+  partners: { label: 'Vendors / Manufacturers (logos)', fields: [['name', 'Name'], ['description', 'Short description']], img: 'logo_url', name: 'name' },
   clients: { label: 'Clients (logos)', fields: [['label', 'Client name']], img: 'logo_url', name: 'label' },
 };
 

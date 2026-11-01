@@ -5,6 +5,7 @@ import { query } from '@/lib/db';
 import { getContent, contactOf } from '@/lib/content';
 import { buildMeta } from '@/lib/seo';
 import OrganArt from '@/components/OrganArt';
+import LogoSlider from '@/components/LogoSlider';
 import JsonLd from '@/components/JsonLd';
 
 export const dynamic = 'force-dynamic';
@@ -30,9 +31,13 @@ export default async function Home() {
   ]);
 
   const ct = contactOf(t);
-  const loop = clients.length ? Array.from({ length: Math.max(1, Math.ceil(8 / clients.length)) }, () => clients).flat() : [];
   const TRUST = ['Sterile & single-use', 'Nationwide delivery in 2-3 days', 'Genuine, authentic devices', 'Dedicated after-sales support'];
   const Tick = () => <svg viewBox="0 0 20 20" className="h-5 w-5 shrink-0 text-brand" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><circle cx="10" cy="10" r="8.2" /><path d="M6.2 10.3l2.6 2.6 5-5.4" /></svg>;
+  const Empty = ({ text }) => (
+    <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+      {[0, 1, 2, 3].map((i) => <div key={i} className="grid h-32 place-items-center rounded-2xl border border-dashed border-line px-2 text-center text-xs text-muted">{i === 1 ? text : ''}</div>)}
+    </div>
+  );
   const Head = ({ eyebrow, title, sub }) => (
     <div className="reveal mx-auto max-w-2xl text-center">
       {eyebrow && <p className="mb-2 text-sm font-semibold uppercase tracking-wider text-brand">{eyebrow}</p>}
@@ -169,44 +174,29 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* MANUFACTURERS / PARTNERS */}
-      {partners.length > 0 && (
-        <section className="section">
-          <div className="wrap">
-            <Head eyebrow="Where our products come from" title={t('home.partnersHeading')} sub="Genuine devices sourced directly from trusted manufacturers." />
-            <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-              {partners.map((p, i) => (
-                <div key={p.id} className="reveal card group flex items-center gap-4 p-5 transition duration-300 hover:-translate-y-1 hover:border-brand hover:shadow-xl" style={{ '--d': `${(i % 3) * 90}ms` }}>
-                  <div className="grid h-20 w-20 shrink-0 place-items-center overflow-hidden rounded-xl border border-line bg-white p-2">
-                    {p.logo_url ? /* eslint-disable-next-line @next/next/no-img-element */ <img src={p.logo_url} alt={`${p.name} logo`} loading="lazy" className="max-h-full max-w-full object-contain transition duration-300 group-hover:scale-110" /> : <span className="font-heading text-2xl font-bold text-brand">{p.name.slice(0, 1)}</span>}
-                  </div>
-                  <div><p className="text-lg font-semibold">{p.name}</p>{p.description && <p className="mt-0.5 text-sm text-muted">{p.description}</p>}</div>
-                </div>
-              ))}
-            </div>
+      {/* VENDORS (manufacturers we buy from) */}
+      <section className="section">
+        <div className="wrap">
+          <Head eyebrow="Where our products come from" title={t('home.partnersHeading')} sub="Genuine devices sourced directly from trusted manufacturers." />
+          <div className="reveal mt-10" style={{ '--d': '100ms' }}>
+            {partners.length > 0
+              ? <LogoSlider variant="vendor" items={partners.map((p) => ({ id: p.id, name: p.name, desc: p.description, logo: p.logo_url }))} />
+              : <Empty text="Vendor logos will appear here" />}
           </div>
-        </section>
-      )}
+        </div>
+      </section>
 
-      {/* CLIENTS: scrolling logo strip */}
-      {clients.length > 0 && (
-        <section className="section bg-alt">
-          <div className="wrap"><Head eyebrow="Our clients" title={t('home.clientsHeading')} /></div>
-          <div className="marquee mt-10">
-            <div className="marquee-track">
-              {[0, 1].map((copy) => (
-                <ul key={copy} className="flex shrink-0 items-center gap-5 pr-5" aria-hidden={copy === 1 ? 'true' : undefined}>
-                  {loop.map((c, i) => (
-                    <li key={`${c.id}-${i}`} className="card grid h-24 w-44 shrink-0 place-items-center p-3 text-center text-sm font-medium">
-                      {c.logo_url ? /* eslint-disable-next-line @next/next/no-img-element */ <img src={c.logo_url} alt={copy === 0 ? c.label : ''} loading="lazy" className="max-h-16 w-auto max-w-full object-contain grayscale transition duration-300 hover:grayscale-0" /> : c.label}
-                    </li>
-                  ))}
-                </ul>
-              ))}
-            </div>
+      {/* CLIENTS */}
+      <section className="section bg-alt">
+        <div className="wrap">
+          <Head eyebrow="Trusted by" title={t('home.clientsHeading')} />
+          <div className="reveal mt-10" style={{ '--d': '100ms' }}>
+            {clients.length > 0
+              ? <LogoSlider variant="client" items={clients.map((c) => ({ id: c.id, name: c.label, logo: c.logo_url }))} />
+              : <Empty text="Client logos will appear here" />}
           </div>
-        </section>
-      )}
+        </div>
+      </section>
 
       {/* CTA */}
       <section className="section">
