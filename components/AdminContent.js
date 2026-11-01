@@ -7,6 +7,7 @@ export default function AdminContent({ flash }) {
   const [orig, setOrig] = useState({});
   const [group, setGroup] = useState('Contact details');
   const [busy, setBusy] = useState(false);
+  const [note, setNote] = useState(null);
 
   const load = useCallback(async () => {
     try {
@@ -31,8 +32,12 @@ export default function AdminContent({ flash }) {
       const j = await r.json().catch(() => ({}));
       if (!r.ok) throw new Error(j.error || 'Save failed');
       setOrig({ ...vals });
-      flash(`Saved ${dirty.length} change${dirty.length === 1 ? '' : 's'} — live on the website now`);
-    } catch (e) { flash(e.message); }
+      const m = `Saved ${dirty.length} change${dirty.length === 1 ? '' : 's'} — live on the website now`;
+      flash(m); setNote({ ok: true, text: 'Saved ✓ live on the website' });
+    } catch (e) {
+      const m = /unauthor/i.test(e.message) ? 'Session expired — please log out and log in again, then save' : `Save failed: ${e.message}`;
+      flash(m); setNote({ ok: false, text: m });
+    }
     setBusy(false);
   }
 
@@ -58,7 +63,9 @@ export default function AdminContent({ flash }) {
           </label>
         ))}
       </div>
-      <div className="sticky bottom-3 mt-5 flex justify-end">
+      <div className="sticky bottom-3 mt-5 flex flex-wrap items-center justify-end gap-3">
+        {note && dirty.length === 0 && <span className={`rounded-lg bg-surface px-3 py-1.5 text-sm font-medium shadow-card ${note.ok ? 'text-emerald-600' : 'text-red-700'}`}>{note.text}</span>}
+        {note && !note.ok && dirty.length > 0 && <span className="rounded-lg bg-surface px-3 py-1.5 text-sm font-medium text-red-700 shadow-card">{note.text}</span>}
         <button onClick={save} disabled={busy || dirty.length === 0} className="btn btn-primary shadow-card disabled:opacity-50">{busy ? 'Saving…' : dirty.length ? `Save ${dirty.length} change${dirty.length === 1 ? '' : 's'}` : 'No changes'}</button>
       </div>
     </div>

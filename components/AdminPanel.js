@@ -4,6 +4,7 @@ import { CATEGORIES } from '@/lib/categories';
 import AdminHome from '@/components/AdminHome';
 import AdminContent from '@/components/AdminContent';
 import AdminNotify from '@/components/AdminNotify';
+import { prepareImage } from '@/lib/clientImage';
 
 const api = async (res, method = 'GET', body, qs = '') => {
   const r = await fetch(`/api/admin/${res}/${qs}`, { method, headers: { 'Content-Type': 'application/json' }, body: body ? JSON.stringify(body) : undefined });
@@ -13,7 +14,7 @@ const api = async (res, method = 'GET', body, qs = '') => {
 };
 
 async function upload(file) {
-  const fd = new FormData(); fd.append('file', file);
+  const fd = new FormData(); fd.append('file', await prepareImage(file));
   const r = await fetch('/api/admin/upload/', { method: 'POST', body: fd });
   const j = await r.json().catch(() => ({}));
   if (!r.ok) throw new Error(j.error || 'Upload failed');
@@ -58,7 +59,12 @@ export default function AdminPanel() {
   }, []);
   useEffect(() => { if (seen.current === null && inquiries.length) seen.current = inquiries[0].id; }, [inquiries]);
 
-  const flash = useCallback((m) => { setMsg(m); setTimeout(() => setMsg(''), 4000); }, []);
+  const flashTimer = useRef(null);
+  const flash = useCallback((m) => {
+    setMsg(m); clearTimeout(flashTimer.current);
+    flashTimer.current = setTimeout(() => setMsg(''), /fail|error|unauthor|could not|invalid|required|only|must|not set|denied|missing|session/i.test(m) ? 10000 : 4000);
+  }, []);
+  const msgBad = /fail|error|unauthor|could not|invalid|required|only|must|not set|denied|missing|session/i.test(msg);
   const newCount = inquiries.filter((i) => i.status === 'new').length;
 
   async function saveProduct(e) {
@@ -98,7 +104,11 @@ export default function AdminPanel() {
       </div>
       <AdminNotify flash={flash} />
       <div className="mb-6 flex flex-wrap gap-2">{tabBtn('inquiries', `Inquiries${newCount ? ` (${newCount} new)` : ''}`)}{tabBtn('products', `Products (${products.length})`)}{tabBtn('gallery', `Gallery (${gallery.length})`)}{tabBtn('home', 'Homepage')}{tabBtn('content', 'Website text')}</div>
-      {msg && <p role="status" className="mb-4 rounded-lg bg-tint px-4 py-2 text-sm font-medium text-brand">{msg}</p>}
+      {msg && (
+        <button type="button" onClick={() => setMsg('')} role="status" className={`fixed left-4 right-4 top-20 z-50 mx-auto max-w-md rounded-xl px-4 py-3 text-left text-sm font-semibold shadow-xl ${msgBad ? 'bg-red-700 text-white' : 'bg-emerald-600 text-white'}`}>
+          {msgBad ? '⚠ ' : '✓ '}{msg}
+        </button>
+      )}
 
       {tab === 'inquiries' && (
         <div className="grid gap-3">

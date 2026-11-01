@@ -79,6 +79,13 @@ export async function PUT(req, { params }) {
     }
     return NextResponse.json({ ok: true });
   }
+  if (['partners', 'clients', 'featured'].includes(params.res) && b.id) {
+    const id = Number(b.id); const url = b.url || '';
+    if (params.res === 'partners') await sql`update partners set logo_url = ${url} where id = ${id}`;
+    else if (params.res === 'clients') await sql`update clients set logo_url = ${url} where id = ${id}`;
+    else await sql`update featured set image_url = ${url} where id = ${id}`;
+    return NextResponse.json({ ok: true });
+  }
   if (params.res !== 'products' || !b.id) return no('Not found', 404);
   const slug = await uniqueSlug(sql, b.category, b.name, Number(b.id));
   const r = await sql`update products set category = ${b.category}, slug = ${slug}, name = ${b.name.trim()}, spec = ${b.spec || ''},
