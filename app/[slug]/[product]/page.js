@@ -20,14 +20,38 @@ async function load(params) {
 
 const firstSentence = (s) => (s.match(/^.*?[.!?](\s|$)/)?.[0] || s).trim();
 
+// Cut at a whole word so Google never shows a broken half-word.
+const clip = (s, n) => {
+  s = s.replace(/\s+/g, ' ').trim();
+  if (s.length <= n) return s;
+  const cut = s.slice(0, n);
+  return cut.slice(0, cut.lastIndexOf(' ')).replace(/[,;:\-–]\s*$/, '') + '…';
+};
+
 export async function generateMetadata({ params }) {
   const { c, p } = await load(params);
   if (!p) return {};
   const info = productInfo(p.name, c.key);
-  const base = (p.description || '').trim() ? p.description.trim() : firstSentence(info.use);
+  const own = (p.description || '').trim();
+  const body = own ? firstSentence(own) : firstSentence(info.use);
+  const description = clip(
+    `${p.name} supplier & distributor in Pakistan. ${body} Order from IntraMed Solution, Lahore. Call or WhatsApp for price & availability.`,
+    158
+  );
+  const keywords = [
+    p.name,
+    info.kind,
+    `${c.name} devices Pakistan`,
+    `${p.name} Pakistan`,
+    `${p.name} price Pakistan`,
+    'medical devices supplier Pakistan',
+    'disposable medical devices Lahore',
+    'IntraMed Solution',
+  ].filter(Boolean);
   return buildMeta({
     title: `${p.name} Supplier & Distributor in Pakistan | Lahore – IntraMed Solution`,
-    description: `${p.name} supplier in Pakistan. ${base}`.replace(/\s+/g, ' ').slice(0, 158),
+    description,
+    keywords,
     path: `/${c.slug}/${p.slug}/`,
     image: p.image_url || undefined,
   });
@@ -74,6 +98,23 @@ export default async function ProductPage({ params }) {
           <h2>{p.name} supplier in Pakistan</h2>
           <p>IntraMed Solution is a {c.name.toLowerCase()} devices supplier and distributor in Pakistan, based in Lahore. We supply sterile, single-use {p.name} to hospitals, clinics and {c.users} in Lahore, Karachi, Islamabad, Rawalpindi, Faisalabad, Multan, Peshawar and across the country, with delivery in 2-3 business days.</p>
           <p className="text-sm">This information is general. The choice and use of any device must be made by a qualified physician according to the manufacturer&apos;s instructions for use.</p>
+        </div>
+
+        <div className="mt-12 max-w-3xl">
+          <h2 className="mb-4 text-xl font-bold">How to order {p.name}</h2>
+          <ol className="grid gap-3 text-muted sm:grid-cols-2">
+            {[
+              ['Send your requirement', 'Use the quotation form below or WhatsApp us with the product name and quantity.'],
+              ['Get a quotation', 'We reply with availability, price and delivery time, usually within one business day.'],
+              ['Confirm the order', 'Approve the quotation and share your hospital or clinic name and delivery address.'],
+              ['Receive your device', 'We deliver across Pakistan in 2-3 business days. Check the box and batch details on arrival.'],
+            ].map(([h, d], i) => (
+              <li key={h} className="card flex gap-4 p-4">
+                <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-brand font-bold text-white">{i + 1}</span>
+                <span><span className="block font-semibold text-ink">{h}</span><span className="text-sm">{d}</span></span>
+              </li>
+            ))}
+          </ol>
         </div>
 
         <div className="mt-10 max-w-3xl">
