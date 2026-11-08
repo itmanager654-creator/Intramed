@@ -6,6 +6,7 @@ import { getContent, contactOf } from '@/lib/content';
 import { buildMeta } from '@/lib/seo';
 import OrganArt from '@/components/OrganArt';
 import LogoSlider from '@/components/LogoSlider';
+import { LatestDevices } from '@/components/DeviceLinks';
 import JsonLd from '@/components/JsonLd';
 
 export const dynamic = 'force-dynamic';
@@ -119,6 +120,8 @@ export default async function Home() {
           </div>
         </div>
       </section>
+
+      <LatestDevices />
 
       {featured.length > 0 && (
         <section className="section bg-alt">

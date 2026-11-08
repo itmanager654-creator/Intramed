@@ -7,6 +7,7 @@ import { buildMeta } from '@/lib/seo';
 import { SITE } from '@/lib/site';
 import OrganArt from '@/components/OrganArt';
 import JsonLd from '@/components/JsonLd';
+import { LatestDevices } from '@/components/DeviceLinks';
 
 export const dynamic = 'force-dynamic';
 
@@ -86,6 +87,17 @@ export default async function CategoryPage({ params }) {
           <div className="grid gap-3">{faqs.map(([q, a]) => <details key={q} className="card p-4"><summary className="cursor-pointer font-medium">{q}</summary><p className="mt-2 text-sm text-muted">{a}</p></details>)}</div>
           <h2 className="mb-4 mt-12 text-2xl font-bold">Other specialities</h2>
           <div className="flex flex-wrap gap-3">{CATEGORIES.filter((x) => x.slug !== c.slug).map((x) => <Link key={x.slug} href={`/${x.slug}/`} className="btn btn-outline">{x.name} Devices</Link>)}</div>
+        </div>
+      </section>
+
+      <section className="section bg-alt">
+        <div className="wrap">
+          <h2 className="mb-6 text-2xl font-bold">Other specialities</h2>
+          <div className="grid gap-4 sm:grid-cols-3">
+            {CATEGORIES.filter((x) => x.slug !== c.slug).map((x) => (
+              <Link key={x.slug} href={`/${x.slug}/`} className="card p-5 font-semibold transition hover:-translate-y-0.5 hover:border-brand">{x.name} devices →</Link>
+            ))}
+          </div>
         </div>
       </section>
 

@@ -5,9 +5,11 @@ import { getCategory } from '@/lib/categories';
 import { SITE } from '@/lib/site';
 import { getContent, contactOf } from '@/lib/content';
 import { buildMeta } from '@/lib/seo';
+import { CATEGORIES } from '@/lib/categories';
 import { productInfo, productFaqs } from '@/lib/productInfo';
 import InquiryForm from '@/components/InquiryForm';
 import JsonLd from '@/components/JsonLd';
+import { RelatedDevices } from '@/components/DeviceLinks';
 
 export const dynamic = 'force-dynamic';
 
@@ -63,7 +65,6 @@ export default async function ProductPage({ params }) {
   const ct = contactOf(await getContent());
   const info = productInfo(p.name, c.key);
   const faqs = productFaqs(p.name, c.key, info, ct.phone);
-  const related = await query`select slug, name from products where category = ${c.key} and id <> ${p.id} order by sort, id limit 6`;
   const url = `${SITE.url}/${c.slug}/${p.slug}/`;
 
   return (
@@ -100,6 +101,8 @@ export default async function ProductPage({ params }) {
           <p className="text-sm">This information is general. The choice and use of any device must be made by a qualified physician according to the manufacturer&apos;s instructions for use.</p>
         </div>
 
+        <p className="mt-8 text-sm"><Link href={`/${c.slug}/`} className="font-semibold text-brand hover:underline">← Back to all {c.name.toLowerCase()} devices</Link> · <Link href="/contact/" className="font-semibold text-brand hover:underline">Contact us</Link></p>
+
         <div className="mt-12 max-w-3xl">
           <h2 className="mb-4 text-xl font-bold">How to order {p.name}</h2>
           <ol className="grid gap-3 text-muted sm:grid-cols-2">
@@ -124,11 +127,13 @@ export default async function ProductPage({ params }) {
 
         <div className="mt-12 grid gap-8 md:grid-cols-2">
           <div><h2 className="mb-3 text-xl font-bold">Request a quotation</h2><InquiryForm product={p.name} compact phone={ct.phone} /></div>
-          {related.length > 0 && (
-            <div><h2 className="mb-3 text-xl font-bold">More {c.name.toLowerCase()} devices</h2>
-              <ul className="grid gap-2">{related.map((r) => <li key={r.slug}><Link href={`/${c.slug}/${r.slug}/`} className="text-brand hover:underline">{r.name}</Link></li>)}</ul>
-            </div>
-          )}
+          <div>
+            <RelatedDevices product={p} category={c} />
+            <h2 className="mb-3 mt-8 text-xl font-bold">Browse by speciality</h2>
+            <ul className="grid gap-2 sm:grid-cols-2">
+              {CATEGORIES.map((x) => <li key={x.slug}><Link href={`/${x.slug}/`} className="text-brand hover:underline">{x.name} devices catalog →</Link></li>)}
+            </ul>
+          </div>
         </div>
       </div>
 
