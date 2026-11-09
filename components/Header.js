@@ -40,16 +40,20 @@ export default function Header() {
         </nav>
         <div className="flex items-center gap-2">
           <button onClick={toggleTheme} aria-label="Toggle dark mode" className="grid h-10 w-10 place-items-center rounded-lg border border-line text-lg">◐</button>
-          <button onClick={() => setOpen(!open)} aria-label="Menu" aria-expanded={open} className="grid h-10 w-10 place-items-center rounded-lg border border-line text-lg xl:hidden">{open ? '✕' : '☰'}</button>
+          <button onClick={() => setOpen(!open)} aria-label="Menu" aria-expanded={open} className="burger grid h-10 w-10 place-items-center rounded-lg border border-line xl:hidden" data-open={open ? 'true' : 'false'}>
+            <span className="burger-bars" aria-hidden="true"><i /><i /><i /></span>
+          </button>
         </div>
       </div>
-      {open && (
-        <nav className="wrap flex flex-col gap-1 pb-4 xl:hidden" aria-label="Mobile">
-          {LINKS.map(([href, label]) => (
-            <Link key={href} href={href} onClick={() => setOpen(false)} className={`rounded-lg px-3 py-2.5 text-sm font-medium ${active(href) ? 'bg-tint text-brand' : 'text-ink'}`}>{label}</Link>
-          ))}
-        </nav>
-      )}
+      <div className={`mobile-menu xl:hidden ${open ? 'is-open' : ''}`}>
+        <div className="overflow-hidden">
+          <nav className="wrap flex flex-col gap-1 pb-4" aria-label="Mobile">
+            {LINKS.map(([href, label], i) => (
+              <Link key={href} href={href} onClick={() => setOpen(false)} style={{ '--d': `${i * 45}ms` }} className={`menu-link rounded-lg px-3 py-2.5 text-sm font-medium ${active(href) ? 'bg-tint text-brand' : 'text-ink'}`}>{label}</Link>
+            ))}
+          </nav>
+        </div>
+      </div>
     </header>
   );
 }

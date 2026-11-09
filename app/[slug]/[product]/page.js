@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { query } from '@/lib/db';
+import { query, queryStrict } from '@/lib/db';
 import { getCategory } from '@/lib/categories';
 import { SITE } from '@/lib/site';
 import { getContent, contactOf } from '@/lib/content';
@@ -16,7 +16,7 @@ export const dynamic = 'force-dynamic';
 async function load(params) {
   const c = getCategory(params.slug);
   if (!c) return {};
-  const rows = await query`select * from products where category = ${c.key} and slug = ${params.product} limit 1`;
+  const rows = await queryStrict`select * from products where category = ${c.key} and slug = ${params.product} limit 1`;
   return { c, p: rows[0] };
 }
 

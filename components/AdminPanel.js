@@ -23,7 +23,22 @@ async function upload(file) {
 
 const EMPTY = { id: 0, category: 'Cardiology', name: '', spec: '', description: '', image_url: '', sort: 0 };
 
+const IDLE_MS = 30 * 60 * 1000;
+
 export default function AdminPanel() {
+  // Auto logout after 30 minutes with no activity (touch, click, typing, scrolling).
+  useEffect(() => {
+    let t;
+    const end = async () => {
+      await fetch('/api/admin/logout/', { method: 'POST' }).catch(() => {});
+      window.location.reload();
+    };
+    const reset = () => { clearTimeout(t); t = setTimeout(end, IDLE_MS); };
+    const evs = ['pointerdown', 'keydown', 'touchstart', 'scroll', 'input'];
+    evs.forEach((e) => window.addEventListener(e, reset, { passive: true }));
+    reset();
+    return () => { clearTimeout(t); evs.forEach((e) => window.removeEventListener(e, reset)); };
+  }, []);
   const [tab, setTab] = useState('inquiries');
   const [products, setProducts] = useState([]);
   const [gallery, setGallery] = useState([]);

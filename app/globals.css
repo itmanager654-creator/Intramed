@@ -64,3 +64,27 @@ html.dark {
   .marquee { overflow-x: auto; }
   *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
 }
+
+/* Hamburger -> X animation */
+.burger-bars { position: relative; width: 20px; height: 14px; display: block; }
+.burger-bars i { position: absolute; left: 0; width: 100%; height: 2px; border-radius: 2px; background: currentColor; transition: transform 0.35s ease, opacity 0.2s ease, top 0.35s ease; }
+.burger-bars i:nth-child(1) { top: 0; }
+.burger-bars i:nth-child(2) { top: 6px; }
+.burger-bars i:nth-child(3) { top: 12px; }
+.burger[data-open="true"] .burger-bars i:nth-child(1) { top: 6px; transform: rotate(45deg); }
+.burger[data-open="true"] .burger-bars i:nth-child(2) { opacity: 0; }
+.burger[data-open="true"] .burger-bars i:nth-child(3) { top: 6px; transform: rotate(-45deg); }
+
+/* Mobile menu slides down, links fade in one after another */
+.mobile-menu { display: grid; grid-template-rows: 0fr; transition: grid-template-rows 0.4s ease, opacity 0.3s ease; opacity: 0; border-bottom: 1px solid transparent; }
+.mobile-menu.is-open { grid-template-rows: 1fr; opacity: 1; border-bottom-color: var(--line); }
+.mobile-menu .menu-link { opacity: 0; transform: translateY(-6px); transition: opacity 0.3s ease, transform 0.3s ease, background-color 0.2s; transition-delay: var(--d, 0ms); }
+.mobile-menu.is-open .menu-link { opacity: 1; transform: none; }
+
+/* Theme button spins a little when pressed */
+button[aria-label="Toggle dark mode"] { transition: transform 0.4s ease; }
+button[aria-label="Toggle dark mode"]:active { transform: rotate(180deg); }
+
+@media (prefers-reduced-motion: reduce) {
+  .burger-bars i, .mobile-menu, .mobile-menu .menu-link { transition: none !important; }
+}

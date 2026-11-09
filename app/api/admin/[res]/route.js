@@ -89,7 +89,9 @@ async function _PUT(req, { params }) {
     return NextResponse.json({ ok: true });
   }
   if (params.res !== 'products' || !b.id) return no('Not found', 404);
-  const slug = await uniqueSlug(sql, b.category, b.name, Number(b.id));
+  // Keep the URL stable on edit: renaming a product must NOT change its link, or Google loses the page.
+  const [cur] = await sql`select slug, category from products where id = ${Number(b.id)}`;
+  const slug = cur && cur.category === b.category ? cur.slug : await uniqueSlug(sql, b.category, b.name, Number(b.id));
   const r = await sql`update products set category = ${b.category}, slug = ${slug}, name = ${b.name.trim()}, spec = ${b.spec || ''},
     description = ${b.description || ''}, image_url = ${b.image_url || ''}, sort = ${Number(b.sort) || 0} where id = ${Number(b.id)} returning *`;
   return NextResponse.json(r[0] || {});
