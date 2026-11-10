@@ -54,20 +54,15 @@ export const ORGANS = {
 <g fill="#ffffff" opacity="0.35"><circle cx="150" cy="64" r="4"/><circle cx="256" cy="70" r="4"/><circle cx="88" cy="92" r="3.5"/><circle cx="360" cy="112" r="3.5"/><circle cx="58" cy="226" r="3.5"/><circle cx="352" cy="196" r="3.5"/></g>
 </svg>`,
 
-  'surgical-medical-supplies': `<svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Surgical scissors and scalpel illustration">
-<defs>
-<linearGradient id="st" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#e6ebf0"/><stop offset="0.5" stop-color="#9aa7b4"/><stop offset="1" stop-color="#5d6b7a"/></linearGradient>
-<linearGradient id="hd" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#3b6fb6"/><stop offset="1" stop-color="#1f4a86"/></linearGradient>
-</defs>
-<path d="M150 232 L 296 60" stroke="url(#st)" stroke-width="18" stroke-linecap="round"/>
-<path d="M250 232 L 104 60" stroke="url(#st)" stroke-width="18" stroke-linecap="round"/>
-<path d="M150 232 L 150 232" stroke="#5d6b7a" stroke-width="2"/>
-<circle cx="140" cy="290" r="44" fill="none" stroke="url(#hd)" stroke-width="16"/>
-<circle cx="260" cy="290" r="44" fill="none" stroke="url(#hd)" stroke-width="16"/>
-<circle cx="200" cy="200" r="11" fill="#3d4a57"/>
-<circle cx="200" cy="200" r="4" fill="#e6ebf0"/>
-<path d="M228 330 L 330 230" stroke="url(#hd)" stroke-width="30" stroke-linecap="round"/>
-<path d="M330 230 L 366 194 L 376 204 L 340 240 Z" fill="url(#st)" stroke="#5d6b7a" stroke-width="2" stroke-linejoin="round"/>
-<path d="M342 216 L 352 226" stroke="#5d6b7a" stroke-width="2"/>
+  'surgical-medical-supplies': `<svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Doctor coat illustration">
+<defs><linearGradient id="cg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#dfe6ee"/></linearGradient></defs>
+<path d="M150 58 L 118 80 L 66 110 C 56 116, 54 128, 60 140 L 92 214 C 96 224, 106 226, 112 218 L 118 208 L 118 354 C 118 364, 126 370, 136 370 L 264 370 C 274 370, 282 364, 282 354 L 282 208 L 288 218 C 294 226, 304 224, 308 214 L 340 140 C 346 128, 344 116, 334 110 L 282 80 L 250 58 C 236 74, 164 74, 150 58 Z" fill="url(#cg)" stroke="#5d6b7a" stroke-width="6" stroke-linejoin="round"/>
+<path d="M200 100 L 200 370" stroke="#9aa7b4" stroke-width="4"/>
+<path d="M150 58 L 186 130 L 200 118 L 214 130 L 250 58" fill="none" stroke="#5d6b7a" stroke-width="6" stroke-linejoin="round"/>
+<circle cx="200" cy="170" r="6" fill="#3b6fb6"/><circle cx="200" cy="222" r="6" fill="#3b6fb6"/><circle cx="200" cy="274" r="6" fill="#3b6fb6"/>
+<rect x="144" y="282" width="34" height="22" rx="4" fill="none" stroke="#5d6b7a" stroke-width="4"/>
+<rect x="222" y="282" width="34" height="22" rx="4" fill="none" stroke="#5d6b7a" stroke-width="4"/>
+<path d="M170 318 L 230 318" stroke="#c4161c" stroke-width="10" stroke-linecap="round"/>
+<path d="M200 288 L 200 348" stroke="#c4161c" stroke-width="10" stroke-linecap="round" opacity="0"/>
 </svg>`,
 };

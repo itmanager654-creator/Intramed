@@ -1,4 +1,4 @@
-import { ensureProductSeo } from '@/lib/db';
+import { ensureProductSeo, ensureSiteContent } from '@/lib/db';
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { isAdmin } from '@/lib/auth';
@@ -71,6 +71,7 @@ async function _PUT(req, { params }) {
   if (!(await isAdmin())) return no('Unauthorized', 401);
   const sql = db(); const b = await req.json();
   if (params.res === 'content') {
+    await ensureSiteContent();
     const allowed = new Set(allFields().map((f) => f[0]));
     for (const [k, v] of Object.entries(b.values || {})) {
       if (!allowed.has(k)) continue;
