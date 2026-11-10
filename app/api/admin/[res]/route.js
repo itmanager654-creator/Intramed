@@ -1,3 +1,4 @@
+import { ensureProductSeo } from '@/lib/db';
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { isAdmin } from '@/lib/auth';
@@ -38,8 +39,9 @@ async function _POST(req, { params }) {
   if (params.res === 'products') {
     if (!b.name?.trim() || !b.category) return no('Name and category are required');
     const slug = await uniqueSlug(sql, b.category, b.name);
-    const r = await sql`insert into products (category, slug, name, spec, description, image_url, sort)
-      values (${b.category}, ${slug}, ${b.name.trim()}, ${b.spec || ''}, ${b.description || ''}, ${b.image_url || ''}, ${Number(b.sort) || 0}) returning *`;
+    await ensureProductSeo();
+    const r = await sql`insert into products (category, slug, name, spec, description, image_url, sort, seo_title, seo_description, seo_keywords)
+      values (${b.category}, ${slug}, ${b.name.trim()}, ${b.spec || ''}, ${b.description || ''}, ${b.image_url || ''}, ${Number(b.sort) || 0}, ${(b.seo_title || '').trim()}, ${(b.seo_description || '').trim()}, ${(b.seo_keywords || '').trim()}) returning *`;
     return NextResponse.json(r[0]);
   }
   if (params.res === 'gallery') {
@@ -90,10 +92,13 @@ async function _PUT(req, { params }) {
   }
   if (params.res !== 'products' || !b.id) return no('Not found', 404);
   // Keep the URL stable on edit: renaming a product must NOT change its link, or Google loses the page.
+  await ensureProductSeo();
   const [cur] = await sql`select slug, category from products where id = ${Number(b.id)}`;
   const slug = cur && cur.category === b.category ? cur.slug : await uniqueSlug(sql, b.category, b.name, Number(b.id));
   const r = await sql`update products set category = ${b.category}, slug = ${slug}, name = ${b.name.trim()}, spec = ${b.spec || ''},
-    description = ${b.description || ''}, image_url = ${b.image_url || ''}, sort = ${Number(b.sort) || 0} where id = ${Number(b.id)} returning *`;
+    description = ${b.description || ''}, image_url = ${b.image_url || ''}, sort = ${Number(b.sort) || 0},
+    seo_title = ${(b.seo_title || '').trim()}, seo_description = ${(b.seo_description || '').trim()}, seo_keywords = ${(b.seo_keywords || '').trim()}
+    where id = ${Number(b.id)} returning *`;
   return NextResponse.json(r[0] || {});
 }
 

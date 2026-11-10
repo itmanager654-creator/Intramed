@@ -64,3 +64,7 @@ create table if not exists push_subs (
   auth text not null,
   created_at timestamptz default now()
 );
+
+alter table products add column if not exists seo_title text not null default '';
+alter table products add column if not exists seo_description text not null default '';
+alter table products add column if not exists seo_keywords text not null default '';

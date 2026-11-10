@@ -36,11 +36,13 @@ export async function generateMetadata({ params }) {
   const info = productInfo(p.name, c.key);
   const own = (p.description || '').trim();
   const body = own ? firstSentence(own) : firstSentence(info.use);
-  const description = clip(
+  const customDesc = (p.seo_description || '').trim();
+  const description = customDesc || clip(
     `${p.name} supplier & distributor in Pakistan. ${body} Order from IntraMed Solution, Lahore. Call or WhatsApp for price & availability.`,
     158
   );
-  const keywords = [
+  const customKeys = (p.seo_keywords || '').split(',').map((k) => k.trim()).filter(Boolean);
+  const keywords = customKeys.length ? customKeys : [
     p.name,
     info.kind,
     `${c.name} devices Pakistan`,
@@ -51,7 +53,7 @@ export async function generateMetadata({ params }) {
     'IntraMed Solution',
   ].filter(Boolean);
   return buildMeta({
-    title: `${p.name} Supplier & Distributor in Pakistan | Lahore – IntraMed Solution`,
+    title: (p.seo_title || '').trim() || `${p.name} Supplier & Distributor in Pakistan | Lahore – IntraMed Solution`,
     description,
     keywords,
     path: `/${c.slug}/${p.slug}/`,

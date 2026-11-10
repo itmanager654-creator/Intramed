@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation';
 import { query } from '@/lib/db';
 import { CATEGORIES, getCategory, categoryFaqs } from '@/lib/categories';
 import { getContent } from '@/lib/content';
-import { buildMeta } from '@/lib/seo';
+import { buildMeta, CATEGORY_KEYWORDS } from '@/lib/seo';
 import { SITE } from '@/lib/site';
 import OrganArt from '@/components/OrganArt';
 import JsonLd from '@/components/JsonLd';
@@ -15,7 +15,7 @@ export async function generateMetadata({ params }) {
   const c = getCategory(params.slug);
   if (!c) return {};
   const t = await getContent();
-  return buildMeta({ title: t(`cat.${c.slug}.seoTitle`), description: t(`cat.${c.slug}.seoDesc`), path: `/${c.slug}/` });
+  return buildMeta({ title: t(`cat.${c.slug}.seoTitle`), description: t(`cat.${c.slug}.seoDesc`), path: `/${c.slug}/`, keywords: CATEGORY_KEYWORDS[c.slug] || [] });
 }
 
 export default async function CategoryPage({ params }) {

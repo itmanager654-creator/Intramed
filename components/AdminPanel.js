@@ -21,7 +21,7 @@ async function upload(file) {
   return j.url;
 }
 
-const EMPTY = { id: 0, category: 'Cardiology', name: '', spec: '', description: '', image_url: '', sort: 0 };
+const EMPTY = { id: 0, category: 'Cardiology', name: '', spec: '', description: '', image_url: '', sort: 0, seo_title: '', seo_description: '', seo_keywords: '' };
 
 const IDLE_MS = 30 * 60 * 1000;
 
@@ -156,6 +156,18 @@ export default function AdminPanel() {
             <input className="field" required placeholder="Product name" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
             <input className="field" placeholder="Specification (e.g. 6F, 100 cm)" value={form.spec} onChange={(e) => setForm({ ...form, spec: e.target.value })} />
             <textarea className="field" rows={4} placeholder="Description" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} />
+            <details className="rounded-xl border border-line p-3">
+              <summary className="cursor-pointer text-sm font-semibold text-brand">Google / SEO settings (optional)</summary>
+              <p className="mt-2 text-xs text-muted">Leave empty and the website writes these automatically from the product name, speciality and description. Fill them only if you want to control the exact text shown on Google.</p>
+              <div className="mt-3 grid gap-3">
+                <label className="text-xs font-medium">Meta title <span className="text-muted">({(form.seo_title || '').length}/60, ideal under 60)</span>
+                  <input className="field mt-1" maxLength={120} placeholder="e.g. Self Expandable Stent Supplier in Pakistan | IntraMed" value={form.seo_title || ''} onChange={(e) => setForm({ ...form, seo_title: e.target.value })} /></label>
+                <label className="text-xs font-medium">Meta description <span className="text-muted">({(form.seo_description || '').length}/155)</span>
+                  <textarea className="field mt-1" rows={3} maxLength={300} placeholder="One or two clear sentences: what it is, where it is used, how to order." value={form.seo_description || ''} onChange={(e) => setForm({ ...form, seo_description: e.target.value })} /></label>
+                <label className="text-xs font-medium">Keywords (comma separated, optional)
+                  <input className="field mt-1" placeholder="e.g. self expandable stent Pakistan, biliary stent, ERCP devices" value={form.seo_keywords || ''} onChange={(e) => setForm({ ...form, seo_keywords: e.target.value })} /></label>
+              </div>
+            </details>
             <input className="field" type="number" placeholder="Sort order" value={form.sort} onChange={(e) => setForm({ ...form, sort: e.target.value })} />
             <label className="text-sm font-medium">Photo<input type="file" accept="image/*" className="field mt-1" onChange={(e) => pickImage(e, (url) => setForm((f) => ({ ...f, image_url: url })))} /></label>
             {form.image_url && /* eslint-disable-next-line @next/next/no-img-element */ <img src={form.image_url} alt="" className="h-24 w-24 rounded-lg border border-line object-cover" />}
