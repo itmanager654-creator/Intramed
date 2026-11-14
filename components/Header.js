@@ -15,11 +15,11 @@ const LINKS = [
 ];
 
 export default function Header() {
-  // After 45 seconds with no activity the logo spins in 3D once; any touch or click stops it.
+  // After 30 seconds with no activity the logo spins in 3D once; any touch or click stops it.
   const [spin, setSpin] = useState(false);
   useEffect(() => {
     let t;
-    const arm = () => { clearTimeout(t); setSpin(false); t = setTimeout(() => setSpin(true), 45000); };
+    const arm = () => { clearTimeout(t); setSpin(false); t = setTimeout(() => setSpin(true), 30000); };
     const evs = ['pointerdown', 'keydown', 'touchstart', 'scroll'];
     evs.forEach((e) => window.addEventListener(e, arm, { passive: true }));
     arm();
