@@ -99,3 +99,11 @@ button[aria-label="Toggle dark mode"]:active { transform: rotate(180deg); }
 @keyframes logoSpin3d { from { transform: rotateY(0deg); } to { transform: rotateY(360deg); } }
 .logo-3d.is-spinning { animation: logoSpin3d 1.6s ease-in-out 1; }
 @media (prefers-reduced-motion: reduce) { .logo-3d.is-spinning { animation: none; } }
+
+/* Full-screen idle screen: black background, big logo spinning in 3D at the centre */
+.idle-screen { position: fixed; inset: 0; z-index: 200; background: #000; display: grid; place-items: center; animation: idleFade 0.6s ease both; }
+.idle-logo { width: min(72vw, 420px); padding: 26px; border-radius: 28px; background: #fff; perspective: 900px; box-shadow: 0 0 60px rgba(196, 22, 28, 0.35); }
+.idle-logo-img { display: block; width: 100%; height: auto; backface-visibility: visible; animation: idleSpin 4s linear infinite; }
+@keyframes idleSpin { from { transform: rotateY(0deg); } to { transform: rotateY(360deg); } }
+@keyframes idleFade { from { opacity: 0; } to { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .idle-logo-img { animation: none; } }

@@ -5,6 +5,7 @@ import Footer from '@/components/Footer';
 import JsonLd from '@/components/JsonLd';
 import FloatingWhatsApp from '@/components/FloatingWhatsApp';
 import ScrollReveal from '@/components/ScrollReveal';
+import IdleOverlay from '@/components/IdleOverlay';
 import { SITE } from '@/lib/site';
 import { getContent, contactOf } from '@/lib/content';
 
@@ -81,6 +82,7 @@ export default async function RootLayout({ children }) {
         <main>{children}</main>
         <Footer />
         <ScrollReveal />
+        <IdleOverlay />
         <FloatingWhatsApp number={ct.wa} message={ct.waMsg} />
         <JsonLd data={graph} />
       </body>
