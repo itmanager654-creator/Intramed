@@ -1,6 +1,7 @@
 'use client';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useEffect, useState } from 'react';
 import { useState } from 'react';
 
 const LINKS = [
@@ -15,6 +16,16 @@ const LINKS = [
 ];
 
 export default function Header() {
+  // After 45 seconds with no activity the logo spins in 3D once; any touch or click stops it.
+  const [spin, setSpin] = useState(false);
+  useEffect(() => {
+    let t;
+    const arm = () => { clearTimeout(t); setSpin(false); t = setTimeout(() => setSpin(true), 45000); };
+    const evs = ['pointerdown', 'keydown', 'touchstart', 'scroll'];
+    evs.forEach((e) => window.addEventListener(e, arm, { passive: true }));
+    arm();
+    return () => { clearTimeout(t); evs.forEach((e) => window.removeEventListener(e, arm)); };
+  }, []);
   const path = usePathname();
   const [open, setOpen] = useState(false);
   const active = (href) => (href === '/' ? path === '/' : path.startsWith(href));
@@ -29,7 +40,7 @@ export default function Header() {
       <div className="wrap flex h-16 items-center justify-between gap-4">
         <Link href="/" aria-label="IntraMed Solution home">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/logo.png" alt="IntraMed Solution logo" className="h-10 w-auto" />
+          <span className="logo-stage"><img src="/logo.png" alt="IntraMed Solution logo" className={`h-10 w-auto logo-3d ${spin ? 'is-spinning' : ''}`} /></span>
         </Link>
         <nav className="hidden items-center gap-0.5 xl:flex" aria-label="Main">
           {LINKS.map(([href, label]) => (

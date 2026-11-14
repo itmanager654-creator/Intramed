@@ -88,3 +88,10 @@ button[aria-label="Toggle dark mode"]:active { transform: rotate(180deg); }
 @media (prefers-reduced-motion: reduce) {
   .burger-bars i, .mobile-menu, .mobile-menu .menu-link { transition: none !important; }
 }
+
+/* Idle 3D logo spin (see Header.js: starts after 45s of no activity) */
+.logo-stage { display: inline-block; perspective: 600px; }
+.logo-3d { transform-style: preserve-3d; backface-visibility: visible; }
+@keyframes logoSpin3d { from { transform: rotateY(0deg); } to { transform: rotateY(360deg); } }
+.logo-3d.is-spinning { animation: logoSpin3d 1.6s ease-in-out 1; }
+@media (prefers-reduced-motion: reduce) { .logo-3d.is-spinning { animation: none; } }
