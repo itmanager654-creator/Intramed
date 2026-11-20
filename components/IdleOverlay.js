@@ -24,7 +24,7 @@ export default function IdleOverlay() {
   return (
     <div className="idle-screen" role="dialog" aria-label="Screen saver" aria-modal="true">
       <div className="idle-logo">
-        <img src="/logo.png" alt="" className="idle-logo-img" />
+        <img src="/logo-light.png" alt="" className="idle-logo-img" />
       </div>
     </div>
   );

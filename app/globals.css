@@ -102,7 +102,7 @@ button[aria-label="Toggle dark mode"]:active { transform: rotate(180deg); }
 
 /* Full-screen idle screen: black background, big logo spinning in 3D at the centre */
 .idle-screen { position: fixed; inset: 0; z-index: 200; background: #000; display: grid; place-items: center; animation: idleFade 0.6s ease both; }
-.idle-logo { width: min(72vw, 420px); padding: 26px; border-radius: 28px; background: #fff; perspective: 900px; box-shadow: 0 0 60px rgba(196, 22, 28, 0.35); }
+.idle-logo { width: min(72vw, 420px); perspective: 900px; filter: drop-shadow(0 0 24px rgba(196, 22, 28, 0.45)); }
 .idle-logo-img { display: block; width: 100%; height: auto; backface-visibility: visible; animation: idleSpin 4s linear infinite; }
 @keyframes idleSpin { from { transform: rotateY(0deg); } to { transform: rotateY(360deg); } }
 @keyframes idleFade { from { opacity: 0; } to { opacity: 1; } }
