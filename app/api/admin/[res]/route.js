@@ -40,8 +40,12 @@ async function _POST(req, { params }) {
     if (!b.name?.trim() || !b.category) return no('Name and category are required');
     const slug = await uniqueSlug(sql, b.category, b.name);
     await ensureProductSeo();
-    const r = await sql`insert into products (category, slug, name, spec, description, image_url, sort, seo_title, seo_description, seo_keywords)
-      values (${b.category}, ${slug}, ${b.name.trim()}, ${b.spec || ''}, ${b.description || ''}, ${b.image_url || ''}, ${Number(b.sort) || 0}, ${(b.seo_title || '').trim()}, ${(b.seo_description || '').trim()}, ${(b.seo_keywords || '').trim()}) returning *`;
+    const x = (k) => String(b[k] || '').trim();
+    const r = await sql`insert into products (category, slug, name, spec, description, image_url, sort, seo_title, seo_description, seo_keywords,
+      intro, features, specs, uses, faqs, brand, origin, reg_no, sizes, img_alt)
+      values (${b.category}, ${slug}, ${b.name.trim()}, ${b.spec || ''}, ${b.description || ''}, ${b.image_url || ''}, ${Number(b.sort) || 0},
+      ${x('seo_title')}, ${x('seo_description')}, ${x('seo_keywords')},
+      ${x('intro')}, ${x('features')}, ${x('specs')}, ${x('uses')}, ${x('faqs')}, ${x('brand')}, ${x('origin')}, ${x('reg_no')}, ${x('sizes')}, ${x('img_alt')}) returning *`;
     return NextResponse.json(r[0]);
   }
   if (params.res === 'gallery') {
@@ -96,9 +100,12 @@ async function _PUT(req, { params }) {
   await ensureProductSeo();
   const [cur] = await sql`select slug, category from products where id = ${Number(b.id)}`;
   const slug = cur && cur.category === b.category ? cur.slug : await uniqueSlug(sql, b.category, b.name, Number(b.id));
+  const x = (k) => String(b[k] || '').trim();
   const r = await sql`update products set category = ${b.category}, slug = ${slug}, name = ${b.name.trim()}, spec = ${b.spec || ''},
     description = ${b.description || ''}, image_url = ${b.image_url || ''}, sort = ${Number(b.sort) || 0},
-    seo_title = ${(b.seo_title || '').trim()}, seo_description = ${(b.seo_description || '').trim()}, seo_keywords = ${(b.seo_keywords || '').trim()}
+    seo_title = ${x('seo_title')}, seo_description = ${x('seo_description')}, seo_keywords = ${x('seo_keywords')},
+    intro = ${x('intro')}, features = ${x('features')}, specs = ${x('specs')}, uses = ${x('uses')}, faqs = ${x('faqs')},
+    brand = ${x('brand')}, origin = ${x('origin')}, reg_no = ${x('reg_no')}, sizes = ${x('sizes')}, img_alt = ${x('img_alt')}
     where id = ${Number(b.id)} returning *`;
   return NextResponse.json(r[0] || {});
 }

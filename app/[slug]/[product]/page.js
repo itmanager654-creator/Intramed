@@ -22,6 +22,11 @@ async function load(params) {
 
 const firstSentence = (s) => (s.match(/^.*?[.!?](\s|$)/)?.[0] || s).trim();
 
+
+// Helpers for the optional detailed fields (one item per line).
+const lines = (t = '') => String(t).split('\n').map((x) => x.trim()).filter(Boolean);
+const pairs = (t = '', sep = ':') => lines(t).map((l) => { const i = l.indexOf(sep); return i > 0 ? [l.slice(0, i).trim(), l.slice(i + sep.length).trim()] : null; }).filter(Boolean);
+
 // Cut at a whole word so Google never shows a broken half-word.
 const clip = (s, n) => {
   s = s.replace(/\s+/g, ' ').trim();
@@ -66,7 +71,8 @@ export default async function ProductPage({ params }) {
   if (!c || !p) notFound();
   const ct = contactOf(await getContent());
   const info = productInfo(p.name, c.key);
-  const faqs = productFaqs(p.name, c.key, info, ct.phone);
+  const customFaqs = pairs(p.faqs, '|');
+  const faqs = customFaqs.length ? customFaqs : productFaqs(p.name, c.key, info, ct.phone);
   const url = `${SITE.url}/${c.slug}/${p.slug}/`;
 
   return (
@@ -90,6 +96,22 @@ export default async function ProductPage({ params }) {
               <a href={`tel:${ct.tel || ct.phone}`} className="btn btn-outline">Call {ct.phone}</a>
             </div>
           </div>
+        </div>
+
+        {p.intro && <p className="mt-12 max-w-3xl whitespace-pre-line text-lg text-muted">{p.intro}</p>}
+        <div className="mt-8 grid gap-6 md:grid-cols-2">
+          {lines(p.features).length > 0 && (
+            <div className="card p-5"><h2 className="mb-3 text-lg font-bold">Key features</h2>
+              <ul className="grid gap-2 text-sm text-muted">{lines(p.features).map((f) => <li key={f} className="flex gap-2"><span className="text-brand">✓</span>{f}</li>)}</ul></div>)}
+          {lines(p.uses).length > 0 && (
+            <div className="card p-5"><h2 className="mb-3 text-lg font-bold">Uses and indications</h2>
+              <ul className="grid gap-2 text-sm text-muted">{lines(p.uses).map((f) => <li key={f} className="flex gap-2"><span className="text-brand">•</span>{f}</li>)}</ul></div>)}
+          {pairs(p.specs).length > 0 && (
+            <div className="card p-5 md:col-span-2"><h2 className="mb-3 text-lg font-bold">Specifications</h2>
+              <table className="w-full text-sm"><tbody>{pairs(p.specs).map(([k, v]) => <tr key={k} className="border-t border-line"><th className="py-2 pr-4 text-left font-semibold">{k}</th><td className="py-2 text-muted">{v}</td></tr>)}</tbody></table></div>)}
+          {[["Brand", p.brand], ["Country of origin", p.origin], ["DRAP registration", p.reg_no], ["Available sizes", p.sizes]].filter(([, v]) => v).length > 0 && (
+            <div className="card p-5 md:col-span-2"><h2 className="mb-3 text-lg font-bold">Product details</h2>
+              <table className="w-full text-sm"><tbody>{[["Brand", p.brand], ["Country of origin", p.origin], ["DRAP registration", p.reg_no], ["Available sizes", p.sizes]].filter(([, v]) => v).map(([k, v]) => <tr key={k} className="border-t border-line"><th className="py-2 pr-4 text-left font-semibold">{k}</th><td className="py-2 text-muted">{v}</td></tr>)}</tbody></table></div>)}
         </div>
 
         <div className="prose-im mt-12 max-w-3xl">
@@ -143,7 +165,7 @@ export default async function ProductPage({ params }) {
       <JsonLd data={{ '@context': 'https://schema.org', '@type': 'ItemPage', '@id': `${url}#page`, url, name: `${p.name} Supplier & Distributor in Pakistan`, isPartOf: { '@id': `${SITE.url}/#website` }, publisher: { '@id': `${SITE.url}/#organization` },
         mainEntity: { '@type': 'Thing', name: p.name, description: p.description || info.what, ...(p.image_url ? { image: p.image_url } : {}) } }} />
       <JsonLd data={{ '@context': 'https://schema.org', '@type': 'Product', name: cleanName(p.name), description: (p.description || '').trim() || info.use, url, category: `${c.name} devices`,
-        image: p.image_url || undefined, brand: { '@type': 'Brand', name: 'IntraMed Solution' },
+        image: p.image_url || undefined, brand: { '@type': 'Brand', name: p.brand || 'IntraMed Solution' },
         manufacturer: { '@id': `${SITE.url}/#organization` }, audience: { '@type': 'MedicalAudience', audienceType: 'Hospitals, clinics and cath-labs' },
         areaServed: { '@type': 'Country', name: 'Pakistan' } }} />
       <JsonLd data={{ '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: faqs.map(([q, a]) => ({ '@type': 'Question', name: q, acceptedAnswer: { '@type': 'Answer', text: a } })) }} />

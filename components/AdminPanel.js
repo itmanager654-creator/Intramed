@@ -21,7 +21,7 @@ async function upload(file) {
   return j.url;
 }
 
-const EMPTY = { id: 0, category: 'Cardiology', name: '', spec: '', description: '', image_url: '', sort: 0, seo_title: '', seo_description: '', seo_keywords: '' };
+const EMPTY = { id: 0, category: 'Cardiology', name: '', spec: '', description: '', image_url: '', sort: 0, seo_title: '', seo_description: '', seo_keywords: '', intro: '', features: '', specs: '', uses: '', faqs: '', brand: '', origin: '', reg_no: '', sizes: '', img_alt: '' };
 
 const IDLE_MS = 30 * 60 * 1000;
 
@@ -166,6 +166,32 @@ export default function AdminPanel() {
                   <textarea className="field mt-1" rows={3} maxLength={300} placeholder="One or two clear sentences: what it is, where it is used, how to order." value={form.seo_description || ''} onChange={(e) => setForm({ ...form, seo_description: e.target.value })} /></label>
                 <label className="text-xs font-medium">Keywords (comma separated, optional)
                   <input className="field mt-1" placeholder="e.g. self expandable stent Pakistan, biliary stent, ERCP devices" value={form.seo_keywords || ''} onChange={(e) => setForm({ ...form, seo_keywords: e.target.value })} /></label>
+              </div>
+            </details>
+            <details className="rounded-xl border border-line p-3">
+              <summary className="cursor-pointer text-sm font-semibold text-brand">Detailed product content (optional, for important products)</summary>
+              <p className="mt-2 text-xs text-muted">Fill any of these to make this product page unique. Empty fields are skipped and the website uses its standard text.</p>
+              <div className="mt-3 grid gap-3">
+                <label className="text-xs font-medium">Short intro (2-3 lines, shown at the top of the product text)
+                  <textarea className="field mt-1" rows={3} placeholder={"What it is, who uses it and why it matters."} value={form.intro || ''} onChange={(e) => setForm({ ...form, intro: e.target.value })} /></label>
+                <label className="text-xs font-medium">Key features (one per line)
+                  <textarea className="field mt-1" rows={4} placeholder={"Radiopaque marker\nFlexible shaft\nSingle-use and sterile"} value={form.features || ''} onChange={(e) => setForm({ ...form, features: e.target.value })} /></label>
+                <label className="text-xs font-medium">Specifications (one per line, Label: value)
+                  <textarea className="field mt-1" rows={4} placeholder={"Diameter: 2.4 mm\nLength: 2300 mm\nMaterial: Stainless steel"} value={form.specs || ''} onChange={(e) => setForm({ ...form, specs: e.target.value })} /></label>
+                <label className="text-xs font-medium">Uses / indications (one per line)
+                  <textarea className="field mt-1" rows={3} placeholder={"Tissue sampling during endoscopy\nGI bleeding investigation"} value={form.uses || ''} onChange={(e) => setForm({ ...form, uses: e.target.value })} /></label>
+                <label className="text-xs font-medium">Custom FAQs (one per line, Question? | Answer)
+                  <textarea className="field mt-1" rows={4} placeholder={"Is it single-use? | Yes, it is sterile and single-use."} value={form.faqs || ''} onChange={(e) => setForm({ ...form, faqs: e.target.value })} /></label>
+                <label className="text-xs font-medium">Brand / manufacturer
+                  <input className="field mt-1" placeholder={"e.g. Boston Scientific"} value={form.brand || ''} onChange={(e) => setForm({ ...form, brand: e.target.value })} /></label>
+                <label className="text-xs font-medium">Country of origin
+                  <input className="field mt-1" placeholder={"e.g. Japan"} value={form.origin || ''} onChange={(e) => setForm({ ...form, origin: e.target.value })} /></label>
+                <label className="text-xs font-medium">DRAP / registration number (if you have it)
+                  <input className="field mt-1" placeholder={"e.g. ELI-00123"} value={form.reg_no || ''} onChange={(e) => setForm({ ...form, reg_no: e.target.value })} /></label>
+                <label className="text-xs font-medium">Available sizes (comma separated)
+                  <input className="field mt-1" placeholder={"e.g. 1.8 mm, 2.4 mm, 3.2 mm"} value={form.sizes || ''} onChange={(e) => setForm({ ...form, sizes: e.target.value })} /></label>
+                <label className="text-xs font-medium">Image description for Google (optional)
+                  <input className="field mt-1" placeholder={"e.g. Biopsy forceps with open jaws"} value={form.img_alt || ''} onChange={(e) => setForm({ ...form, img_alt: e.target.value })} /></label>
               </div>
             </details>
             <input className="field" type="number" placeholder="Sort order" value={form.sort} onChange={(e) => setForm({ ...form, sort: e.target.value })} />
