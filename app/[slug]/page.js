@@ -8,6 +8,7 @@ import { SITE } from '@/lib/site';
 import OrganArt from '@/components/OrganArt';
 import JsonLd from '@/components/JsonLd';
 import { LatestDevices } from '@/components/DeviceLinks';
+import { cleanName } from '@/lib/seo';
 
 export const dynamic = 'force-dynamic';
 
@@ -58,8 +59,8 @@ export default async function CategoryPage({ params }) {
                   {products.map((p, i) => (
                     <tr key={p.id} className="border-t border-line align-middle">
                       <td className="p-3 text-muted">{i + 1}</td>
-                      <td className="p-3">{p.image_url ? /* eslint-disable-next-line @next/next/no-img-element */ <img src={p.image_url} alt={p.name} width={64} height={64} loading="lazy" className="h-16 w-16 rounded-lg border border-line object-cover" /> : <span className="grid h-16 w-16 place-items-center rounded-lg bg-surface2 text-xs text-muted">No photo</span>}</td>
-                      <td className="p-3 font-medium"><Link href={`/${c.slug}/${p.slug}/`} className="text-brand hover:underline">{p.name}</Link></td>
+                      <td className="p-3">{p.image_url ? /* eslint-disable-next-line @next/next/no-img-element */ <img src={p.image_url} alt={p.name} width={64} height={64} loading="lazy" className="h-16 w-16 rounded-lg border border-line object-cover" /> : <span className="grid h-16 w-16 place-items-center"><OrganArt type={c.slug} className="h-full w-full p-1" /></span>}</td>
+                      <td className="p-3 font-medium"><Link href={`/${c.slug}/${p.slug}/`} className="text-brand hover:underline">{cleanName(p.name)}</Link></td>
                       <td className="p-3 text-muted">{p.spec}</td>
                     </tr>
                   ))}

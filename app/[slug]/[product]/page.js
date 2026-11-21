@@ -4,7 +4,7 @@ import { query, queryStrict } from '@/lib/db';
 import { getCategory } from '@/lib/categories';
 import { SITE } from '@/lib/site';
 import { getContent, contactOf } from '@/lib/content';
-import { buildMeta } from '@/lib/seo';
+import { buildMeta, cleanName } from '@/lib/seo';
 import { CATEGORIES } from '@/lib/categories';
 import { productInfo, productFaqs } from '@/lib/productInfo';
 import InquiryForm from '@/components/InquiryForm';
@@ -53,7 +53,7 @@ export async function generateMetadata({ params }) {
     'IntraMed Solution',
   ].filter(Boolean);
   return buildMeta({
-    title: (p.seo_title || '').trim() || `${p.name} Supplier & Distributor in Pakistan | Lahore – IntraMed Solution`,
+    title: (p.seo_title || '').trim() || `${cleanName(p.name)}, Supplier & Distributor In Pakistan | IntraMed Solution`,
     description,
     keywords,
     path: `/${c.slug}/${p.slug}/`,
@@ -142,6 +142,10 @@ export default async function ProductPage({ params }) {
       {/* ItemPage + FAQ + Breadcrumb. No "Product" markup: Google's Product snippets require a price or reviews, which a quotation-based supplier does not publish. */}
       <JsonLd data={{ '@context': 'https://schema.org', '@type': 'ItemPage', '@id': `${url}#page`, url, name: `${p.name} Supplier & Distributor in Pakistan`, isPartOf: { '@id': `${SITE.url}/#website` }, publisher: { '@id': `${SITE.url}/#organization` },
         mainEntity: { '@type': 'Thing', name: p.name, description: p.description || info.what, ...(p.image_url ? { image: p.image_url } : {}) } }} />
+      <JsonLd data={{ '@context': 'https://schema.org', '@type': 'Product', name: cleanName(p.name), description: (p.description || '').trim() || info.use, url, category: `${c.name} devices`,
+        image: p.image_url || undefined, brand: { '@type': 'Brand', name: 'IntraMed Solution' },
+        manufacturer: { '@id': `${SITE.url}/#organization` }, audience: { '@type': 'MedicalAudience', audienceType: 'Hospitals, clinics and cath-labs' },
+        areaServed: { '@type': 'Country', name: 'Pakistan' } }} />
       <JsonLd data={{ '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: faqs.map(([q, a]) => ({ '@type': 'Question', name: q, acceptedAnswer: { '@type': 'Answer', text: a } })) }} />
       <JsonLd data={{ '@context': 'https://schema.org', '@type': 'BreadcrumbList', itemListElement: [
         { '@type': 'ListItem', position: 1, name: 'Home', item: SITE.url + '/' },
