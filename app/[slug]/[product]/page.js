@@ -98,7 +98,10 @@ export default async function ProductPage({ params }) {
           </div>
         </div>
 
-        {p.intro && <p className="mt-12 max-w-3xl whitespace-pre-line text-lg text-muted">{p.intro}</p>}
+        <p data-answer="where-to-buy" className="mt-12 max-w-3xl rounded-xl border-l-4 border-brand bg-tint p-4 text-base font-medium">
+          <span className="font-bold">Where can I buy {cleanName(p.name)} in Pakistan?</span> It is available from IntraMed Solution, a medical devices supplier and distributor based in Lahore. We supply {cleanName(p.name)} to hospitals, clinics and cath-labs across Pakistan, with delivery in 2-3 business days. Call {ct.phone} or send an inquiry for a quotation.
+        </p>
+        {p.intro && <p className="mt-6 max-w-3xl whitespace-pre-line text-lg text-muted">{p.intro}</p>}
         <div className="mt-8 grid gap-6 md:grid-cols-2">
           {lines(p.features).length > 0 && (
             <div className="card p-5"><h2 className="mb-3 text-lg font-bold">Key features</h2>

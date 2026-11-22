@@ -37,6 +37,23 @@ export const metadata = {
 const themeInit = `document.documentElement.classList.add('rv');try{if(localStorage.getItem('theme')==='dark')document.documentElement.classList.add('dark')}catch(e){}`;
 
 export default async function RootLayout({ children }) {
+  const orgSchema = {
+    '@context': 'https://schema.org',
+    '@type': ['MedicalBusiness', 'Organization'],
+    '@id': `${SITE.url}/#organization`,
+    name: SITE.name,
+    alternateName: 'IntraMed',
+    url: SITE.url,
+    logo: `${SITE.url}/logo.png`,
+    image: `${SITE.url}/og-image.png`,
+    description: 'Medical devices supplier and distributor in Pakistan, based in Lahore. Sterile, single-use cardiology, urology, gastroenterology, vascular and surgical supplies for hospitals, clinics and cath-labs.',
+    telephone: SITE.tel,
+    email: SITE.email,
+    address: { '@type': 'PostalAddress', addressLocality: 'Lahore', addressRegion: 'Punjab', addressCountry: 'PK' },
+    areaServed: SITE.cities.map((c) => ({ '@type': 'City', name: c })).concat([{ '@type': 'Country', name: 'Pakistan' }]),
+    knowsAbout: ['Cath lab devices', 'Interventional cardiology devices', 'Gastroenterology devices', 'Urology devices', 'Vascular devices', 'Surgical supplies', 'Medical devices Pakistan'],
+    sameAs: [],
+  };
   const t = await getContent();
   const ct = contactOf(t);
   const social = ct.social.map(([, v]) => v);
@@ -78,6 +95,7 @@ export default async function RootLayout({ children }) {
     <html lang="en" className={`${inter.variable} ${poppins.variable}`} suppressHydrationWarning>
       <head><script dangerouslySetInnerHTML={{ __html: themeInit }} /></head>
       <body>
+        <JsonLd data={orgSchema} />
         <Header />
         <main>{children}</main>
         <Footer />

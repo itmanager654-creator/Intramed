@@ -1,11 +1,12 @@
-import { query } from '@/lib/db';
+import { query, ensureProductSeo } from '@/lib/db';
 import { CATEGORIES, getCategoryByKey } from '@/lib/categories';
 import { SITE } from '@/lib/site';
 
 export const dynamic = 'force-dynamic';
 
 export async function GET() {
-  const products = await query`select slug, name, category from products order by category, sort, id`;
+  await ensureProductSeo();
+  const products = await query`select slug, name, category, description, intro from products order by category, sort, id`;
   const lines = [
     '# IntraMed Solution',
     '',
@@ -19,7 +20,10 @@ export async function GET() {
     '## Products',
     ...products.map((p) => {
       const c = getCategoryByKey(p.category);
-      return c ? `- [${p.name}](${SITE.url}/${c.slug}/${p.slug}/): ${c.name} device` : null;
+      if (!c) return null;
+      const d = (p.intro || p.description || '').replace(/\s+/g, ' ').trim();
+      const short = d.length > 160 ? d.slice(0, 157).replace(/\s+\S*$/, '') + '...' : d;
+      return `- [${String(p.name).replace(/\s*\(\s*\)/g, '').trim()}](${SITE.url}/${c.slug}/${p.slug}/): ${c.name} device, supplied by IntraMed Solution in Lahore, Pakistan.${short ? ' ' + short : ''}`;
     }).filter(Boolean),
     '',
     '## Other pages',
