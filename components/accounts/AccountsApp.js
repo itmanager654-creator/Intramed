@@ -166,7 +166,7 @@ function Dashboard() {
           </ul>
         </div>
       </div>
-      <p className="text-xs text-muted">iPhone par: Safari > Share > Add to Home Screen. Android/Chrome par: Install app button ya ⋮ > Install app.</p>
+      <p className="text-xs text-muted">iPhone par: Safari &gt; Share &gt; Add to Home Screen. Android/Chrome par: Install app button ya ⋮ &gt; Install app.</p>
     </div>
   );
 }
