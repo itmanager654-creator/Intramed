@@ -11,7 +11,7 @@ export default function IdleOverlay() {
   const [show, setShow] = useState(false);
 
   useEffect(() => {
-    if (path?.startsWith('/admin')) { setShow(false); return; }
+    if (path?.startsWith('/admin') || path?.startsWith('/accounts')) { setShow(false); return; }
     let t;
     const arm = () => { clearTimeout(t); setShow(false); t = setTimeout(() => setShow(true), IDLE_MS); };
     const evs = ['pointerdown', 'keydown', 'touchstart', 'scroll'];
