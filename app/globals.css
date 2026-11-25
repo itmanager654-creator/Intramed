@@ -162,3 +162,7 @@ body.app-mode { background: #f7f5f4; }
   .acc-card { padding: 1rem; border-radius: 16px; }
   .acc td, .acc-thead th { padding: .6rem .5rem; }
 }
+
+.acc-backdrop { background: rgba(20,18,18,.38); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); }
+@keyframes accPop { from { opacity: 0; transform: translateY(10px) scale(.97); } to { opacity: 1; transform: none; } }
+.acc-pop { animation: accPop .22s ease-out both; }

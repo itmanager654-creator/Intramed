@@ -1,6 +1,8 @@
 'use client';
 import { useEffect, useMemo, useState } from 'react';
 import { words } from '@/lib/numWords';
+import { askConfirm } from '@/lib/dialog';
+import Dialog from '@/components/accounts/Dialog';
 
 const DOC = {
   office: 'Office # 05 Opposite Jamal-e-Mustafa Mosque Amir Town Road, Harbanspura, Lahore.',
@@ -63,6 +65,7 @@ export default function AccountsApp() {
 
   return (
     <div className="acc min-h-screen">
+      <Dialog />
       <header className="acc-header sticky top-0 z-30">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-4 py-3">
           <div className="flex items-center gap-3">
@@ -183,7 +186,7 @@ function Dashboard({ go }) {
 }
 
 function NewInvoice() {
-  const [h, setH] = useState({ invoice_date: todayISO(), customer_name: '', phone: '', age: '', hospital: '', city: 'Lahore', payment_mode: 'Cash', paid: '', tax_pct: '0', notes: '' });
+  const [h, setH] = useState({ invoice_date: todayISO(), customer_name: '', phone: '', age: '', hospital: '', city: 'Lahore', payment_mode: 'Cash', paid: '', tax_pct: '0', notes: '', show_stamp: true });
   const [items, setItems] = useState([emptyItem()]);
   const [names, setNames] = useState([]);
   const [nextNo, setNextNo] = useState('');
@@ -215,7 +218,7 @@ function NewInvoice() {
 
   const doc = (no) => ({
     invoice_no: no, invoice_date: h.invoice_date, customer_name: h.customer_name, phone: h.phone, age: h.age,
-    hospital: h.hospital, city: h.city, items: rows, subtotal, tax_amount: tax, total, paid, notes: h.notes,
+    hospital: h.hospital, city: h.city, items: rows, subtotal, tax_amount: tax, total, paid, notes: h.notes, show_stamp: h.show_stamp,
   });
 
   async function save() {
@@ -302,6 +305,7 @@ function NewInvoice() {
           <label className="text-xs font-medium">Amount received (Rs.)<input type="number" className="field mt-1" placeholder="Leave empty if unpaid" value={h.paid} onChange={set('paid')} /></label>
           <label className="text-xs font-medium">Sales tax %<input type="number" className="field mt-1" value={h.tax_pct} onChange={set('tax_pct')} /></label>
           <label className="text-xs font-medium">Notes (optional)<input className="field mt-1" value={h.notes} onChange={set('notes')} /></label>
+          <label className="flex cursor-pointer items-center gap-3 rounded-xl border border-line p-3 text-sm font-medium"><input type="checkbox" className="h-4 w-4 accent-[#c4161c]" checked={h.show_stamp} onChange={(e) => setH({ ...h, show_stamp: e.target.checked })} />Put company stamp on this invoice</label>
         </div>
         <div className="acc-card space-y-2 p-5 text-sm">
           <div className="flex justify-between"><span>Subtotal</span><b>Rs. {fmt(subtotal)}</b></div>
@@ -342,7 +346,8 @@ function InvoiceList() {
     setOpen(r.invoice);
   }
   async function del(id, no) {
-    if (!window.confirm(`Delete invoice ${no}? Its items go back to stock. This cannot be undone.`)) return;
+    const ok = await askConfirm({ title: `Delete invoice ${no}?`, message: 'Its items go back to stock. This cannot be undone.', confirmText: 'Delete', danger: true });
+    if (!ok) return;
     await api(`/api/accounts/invoices/${id}`, { method: 'DELETE' });
     load();
   }
@@ -440,8 +445,8 @@ function ShareButtons({ inv }) {
         pdf.save(name);
         const digits = String(inv.phone || '').replace(/\D/g, '').replace(/^0/, '92');
         const url = `https://wa.me/${digits}?text=${encodeURIComponent(text + ' (PDF attached in our chat)')}`;
-        window.open(url, '_blank');
-        setMsg('PDF downloaded. Attach it in the WhatsApp chat that just opened.');
+        window.location.href = url;
+        setMsg('PDF downloaded. Open WhatsApp and attach it to the chat.');
       }
     } catch (e) { if (e.name !== 'AbortError') setMsg(`Share failed: ${e.message}`); }
     setBusy('');
@@ -488,7 +493,8 @@ function StockTab() {
     } catch (x) { setErr(x.message); }
   }
   async function delMove(m) {
-    if (!window.confirm('Delete this purchase entry?')) return;
+    const ok = await askConfirm({ title: 'Delete this purchase?', message: 'Stock will be reduced by this quantity.', confirmText: 'Delete', danger: true });
+    if (!ok) return;
     try { await api(`/api/accounts/movements/${m.id}`, { method: 'DELETE' }); load(); }
     catch (x) { setErr(x.message); }
   }
@@ -597,7 +603,8 @@ function ProfitLoss() {
     } catch (x) { setErr(x.message); }
   }
   async function delExpense(id) {
-    if (!window.confirm('Delete this expense?')) return;
+    const ok = await askConfirm({ title: 'Delete this expense?', message: 'It will be removed from the profit & loss.', confirmText: 'Delete', danger: true });
+    if (!ok) return;
     await api(`/api/accounts/expenses/${id}`, { method: 'DELETE' });
     load();
   }
@@ -762,7 +769,10 @@ function InvoiceView({ inv }) {
                 <p className="mt-3 font-serif">({words(inv.total)})</p>
                 {inv.notes && <p className="mt-2 text-[12px]">Note: {inv.notes}</p>}
                 <p className="mt-6 font-serif text-[12px]">For. INTRAMED SOLUTION</p>
-                <div className="mt-12 w-56 border-t border-black pt-1 text-[12px]">Authorized signature</div>
+                <div className="relative mt-4 h-40 w-72">
+                  {inv.show_stamp !== false && <img src="/stamp.png" alt="Company stamp" className="absolute -left-3 top-0 w-40 -rotate-6 opacity-90" />}
+                  <div className="absolute bottom-0 left-0 w-56 border-t border-black pt-1 text-[12px]">Authorized signature</div>
+                </div>
               </div>
             )}
 

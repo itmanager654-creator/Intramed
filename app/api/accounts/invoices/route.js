@@ -52,8 +52,8 @@ export async function POST(req) {
   for (let attempt = 0; attempt < 3; attempt++) {
     try {
       invoice_no = await nextNumber();
-      const r = await queryStrict`insert into invoices (invoice_no, invoice_date, customer_name, age, hospital, city, notes, subtotal, tax_pct, tax_amount, total, paid, payment_mode, phone)
-        values (${invoice_no}, ${date}, ${String(b.customer_name).trim()}, ${String(b.age || '').trim()}, ${String(b.hospital || '').trim()}, ${String(b.city || '').trim()}, ${String(b.notes || '').trim()}, ${subtotal}, ${taxPct}, ${tax}, ${total}, ${paid}, ${String(b.payment_mode || '')}, ${String(b.phone || '').trim()}) returning id`;
+      const r = await queryStrict`insert into invoices (invoice_no, invoice_date, customer_name, age, hospital, city, notes, subtotal, tax_pct, tax_amount, total, paid, payment_mode, phone, show_stamp)
+        values (${invoice_no}, ${date}, ${String(b.customer_name).trim()}, ${String(b.age || '').trim()}, ${String(b.hospital || '').trim()}, ${String(b.city || '').trim()}, ${String(b.notes || '').trim()}, ${subtotal}, ${taxPct}, ${tax}, ${total}, ${paid}, ${String(b.payment_mode || '')}, ${String(b.phone || '').trim()}, ${b.show_stamp !== false}) returning id`;
       id = r[0].id;
       break;
     } catch (e) {
