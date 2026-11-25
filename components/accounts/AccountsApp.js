@@ -81,7 +81,7 @@ export default function AccountsApp() {
         </nav>
       </header>
       <main className="mx-auto max-w-6xl px-4 py-6 md:py-8">
-        {tab === 'dashboard' && <Dashboard />}
+        {tab === 'dashboard' && <Dashboard go={setTab} />}
         {tab === 'new' && <NewInvoice />}
         {tab === 'list' && <InvoiceList />}
         {tab === 'stock' && <StockTab />}
@@ -123,7 +123,7 @@ function Login({ onOk }) {
   );
 }
 
-function Dashboard() {
+function Dashboard({ go }) {
   const [s, setS] = useState(null);
   const [err, setErr] = useState('');
   useEffect(() => { api('/api/accounts/stats').then(setS).catch((e) => setErr(e.message)); }, []);
@@ -136,6 +136,13 @@ function Dashboard() {
   ];
   return (
     <div className="space-y-6">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h2 className="text-xl font-extrabold">Overview</h2>
+          <p className="text-sm text-muted">Sales, payments and profit at a glance.</p>
+        </div>
+        <button onClick={() => go('new')} className="btn btn-primary">+ New invoice</button>
+      </div>
       <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
         {cards.map(([l, v]) => (
           <div key={l} className="acc-card acc-stat p-5">

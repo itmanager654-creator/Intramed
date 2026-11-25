@@ -109,7 +109,7 @@ button[aria-label="Toggle dark mode"]:active { transform: rotate(180deg); }
 @media (prefers-reduced-motion: reduce) { .idle-logo-img { animation: none; } }
 
 /* Accounts app: full-screen app look, and print only the invoice */
-body.app-mode header, body.app-mode footer, body.app-mode a[href*="wa.me"], body.app-mode a[href*="whatsapp"] { display: none !important; }
+body.app-mode > header, body.app-mode > footer, body.app-mode a[href*="wa.me"], body.app-mode a[href*="whatsapp"] { display: none !important; }
 body.app-mode { background: #f7f5f4; }
 @media print {
   body.app-mode * { visibility: hidden !important; }
