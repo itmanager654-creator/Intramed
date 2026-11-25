@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
-import { queryStrict, ensureAccounts } from '@/lib/db';
+import { queryStrict, ensureBusiness } from '@/lib/db';
 import { isAuthed } from '@/lib/accountsAuth';
+import { itemIdFor, avgCost } from '@/lib/stock';
 
 export const dynamic = 'force-dynamic';
 const pad = (n) => String(n).padStart(6, '0');
@@ -15,7 +16,7 @@ async function nextNumber() {
 
 export async function GET(req) {
   if (!isAuthed(req)) return deny();
-  await ensureAccounts();
+  await ensureBusiness();
   const rows = await queryStrict`select id, invoice_no, to_char(invoice_date, 'YYYY-MM-DD') as invoice_date, customer_name, hospital, total, paid,
     case when paid >= total then 'Paid' when paid > 0 then 'Partial' else 'Unpaid' end as status
     from invoices order by id desc limit 1000`;
@@ -27,9 +28,9 @@ export async function GET(req) {
 
 export async function POST(req) {
   if (!isAuthed(req)) return deny();
-  await ensureAccounts();
+  await ensureBusiness();
   const b = await req.json();
-  if (!String(b.customer_name || '').trim()) return NextResponse.json({ error: 'Customer name required' }, { status: 400 });
+  if (!String(b.customer_name || '').trim()) return NextResponse.json({ error: 'Customer name is required' }, { status: 400 });
   const lines = (b.items || [])
     .filter((i) => String(i.description || '').trim())
     .map((i, n) => {
@@ -37,7 +38,7 @@ export async function POST(req) {
       const unit = num(i.unit_price);
       return { n, qty, description: String(i.description).trim(), specs: String(i.specs || '').trim(), batch: String(i.batch || '').trim(), exp_date: String(i.exp_date || '').trim(), unit, amount: Math.round(qty * unit * 100) / 100 };
     });
-  if (!lines.length) return NextResponse.json({ error: 'At least one item required' }, { status: 400 });
+  if (!lines.length) return NextResponse.json({ error: 'Add at least one item' }, { status: 400 });
 
   const subtotal = lines.reduce((a, l) => a + l.amount, 0);
   const taxPct = num(b.tax_pct);
@@ -51,8 +52,8 @@ export async function POST(req) {
   for (let attempt = 0; attempt < 3; attempt++) {
     try {
       invoice_no = await nextNumber();
-      const r = await queryStrict`insert into invoices (invoice_no, invoice_date, customer_name, age, hospital, city, notes, subtotal, tax_pct, tax_amount, total, paid, payment_mode)
-        values (${invoice_no}, ${date}, ${String(b.customer_name).trim()}, ${String(b.age || '').trim()}, ${String(b.hospital || '').trim()}, ${String(b.city || '').trim()}, ${String(b.notes || '').trim()}, ${subtotal}, ${taxPct}, ${tax}, ${total}, ${paid}, ${String(b.payment_mode || '')}) returning id`;
+      const r = await queryStrict`insert into invoices (invoice_no, invoice_date, customer_name, age, hospital, city, notes, subtotal, tax_pct, tax_amount, total, paid, payment_mode, phone)
+        values (${invoice_no}, ${date}, ${String(b.customer_name).trim()}, ${String(b.age || '').trim()}, ${String(b.hospital || '').trim()}, ${String(b.city || '').trim()}, ${String(b.notes || '').trim()}, ${subtotal}, ${taxPct}, ${tax}, ${total}, ${paid}, ${String(b.payment_mode || '')}, ${String(b.phone || '').trim()}) returning id`;
       id = r[0].id;
       break;
     } catch (e) {
@@ -61,10 +62,15 @@ export async function POST(req) {
   }
   try {
     for (const l of lines) {
-      await queryStrict`insert into invoice_items (invoice_id, position, qty, description, specs, batch, exp_date, unit_price, amount)
-        values (${id}, ${l.n}, ${l.qty}, ${l.description}, ${l.specs}, ${l.batch}, ${l.exp_date}, ${l.unit}, ${l.amount})`;
+      const itemId = await itemIdFor(l.description);
+      const cost = await avgCost(itemId);
+      await queryStrict`insert into invoice_items (invoice_id, position, qty, description, specs, batch, exp_date, unit_price, amount, item_id, unit_cost)
+        values (${id}, ${l.n}, ${l.qty}, ${l.description}, ${l.specs}, ${l.batch}, ${l.exp_date}, ${l.unit}, ${l.amount}, ${itemId}, ${cost})`;
+      await queryStrict`insert into stock_movements (item_id, kind, qty, unit_cost, unit_price, ref, moved_on)
+        values (${itemId}, 'out', ${l.qty}, ${cost}, ${l.unit}, ${invoice_no}, ${date})`;
     }
   } catch (e) {
+    await queryStrict`delete from stock_movements where ref = ${invoice_no} and kind = 'out'`;
     await queryStrict`delete from invoices where id = ${id}`;
     throw e;
   }

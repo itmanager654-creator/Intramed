@@ -118,3 +118,47 @@ body.app-mode { background: #f7f5f4; }
   body.app-mode .fixed { position: static !important; background: none !important; padding: 0 !important; }
   @page { size: A4; margin: 12mm; }
 }
+
+/* Invoice pages: each A4 page prints on its own sheet */
+@media print {
+  body.app-mode .inv-page { box-shadow: none !important; margin: 0 !important; page-break-after: always; break-after: page; }
+  body.app-mode .inv-page:last-child { page-break-after: auto; break-after: auto; }
+  @page { size: A4; margin: 0; }
+}
+
+/* ---------- Accounts app theme ---------- */
+.acc { background: radial-gradient(1200px 500px at 10% -10%, rgba(196,22,28,.07), transparent 60%), #f6f5f4; color: #1d1d1f; }
+.acc-header { background: rgba(255,255,255,.82); backdrop-filter: saturate(160%) blur(12px); -webkit-backdrop-filter: saturate(160%) blur(12px); border-bottom: 1px solid #ece7e6; box-shadow: 0 1px 0 rgba(0,0,0,.02), 0 8px 24px -18px rgba(196,22,28,.35); }
+.acc-header::before { content: ""; display: block; height: 3px; background: linear-gradient(90deg, #c4161c, #e5484d, #c4161c); }
+.acc-tabs { scrollbar-width: none; }
+.acc-tabs::-webkit-scrollbar { display: none; }
+.acc-tab { border: 1px solid #e8e2e1; background: #fff; border-radius: 999px; padding: .5rem 1.05rem; font-size: .875rem; font-weight: 600; color: #3a3a3c; transition: all .2s ease; }
+.acc-tab:hover { border-color: #c4161c; color: #c4161c; }
+.acc-tab.is-active { background: linear-gradient(135deg, #c4161c, #9d0f14); border-color: transparent; color: #fff; box-shadow: 0 8px 18px -10px rgba(196,22,28,.8); }
+.acc-card { background: #fff; border: 1px solid #efe9e8; border-radius: 18px; box-shadow: 0 1px 2px rgba(0,0,0,.03), 0 10px 30px -22px rgba(0,0,0,.25); padding: 1.25rem; transition: box-shadow .25s ease, transform .25s ease; }
+.acc-card:hover { box-shadow: 0 1px 2px rgba(0,0,0,.03), 0 16px 36px -22px rgba(0,0,0,.3); }
+.acc-stat { position: relative; overflow: hidden; }
+.acc-stat::after { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: linear-gradient(180deg, #c4161c, #e5484d); border-radius: 0 4px 4px 0; }
+.acc-login { background: radial-gradient(900px 500px at 50% -20%, rgba(196,22,28,.18), transparent 70%), #f6f5f4; }
+.acc-table-wrap { padding: 0; overflow: hidden; }
+.acc-table-wrap table { border-collapse: separate; border-spacing: 0; }
+.acc-thead { background: #fbf3f3; }
+.acc-thead th { font-size: .72rem; text-transform: uppercase; letter-spacing: .06em; color: #6b6b70; padding: .85rem .75rem; border-bottom: 1px solid #f0e6e5; }
+.acc tbody tr { transition: background-color .15s ease; }
+.acc tbody tr:hover { background: #fdf7f7; }
+.acc td { padding: .75rem; }
+.acc-empty { padding: 2rem; text-align: center; }
+.acc .field { border-radius: 12px; border: 1px solid #e6e0df; background: #fff; padding: .7rem .85rem; width: 100%; transition: border-color .2s, box-shadow .2s; }
+.acc .field:focus { outline: none; border-color: #c4161c; box-shadow: 0 0 0 4px rgba(196,22,28,.12); }
+.acc .btn { border-radius: 12px; transition: transform .15s ease, box-shadow .2s ease, background-color .2s ease; }
+.acc .btn:hover { transform: translateY(-1px); }
+.acc .btn:active { transform: translateY(0) scale(.99); }
+.acc .btn-primary { background: linear-gradient(135deg, #c4161c, #9d0f14); box-shadow: 0 10px 20px -12px rgba(196,22,28,.9); }
+.acc .btn-outline { background: #fff; border: 1px solid #e3dddc; }
+.acc .btn-outline:hover { border-color: #c4161c; color: #c4161c; }
+.acc label { font-size: .75rem; color: #6b6b70; }
+.acc h2 { letter-spacing: -.01em; }
+@media (max-width: 640px) {
+  .acc-card { padding: 1rem; border-radius: 16px; }
+  .acc td, .acc-thead th { padding: .6rem .5rem; }
+}
